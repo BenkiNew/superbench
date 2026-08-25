@@ -1,0 +1,14 @@
+name: test-mistral
+version: 1.0.0
+schema: v1
+models:
+  - name: Mistral Large
+    provider: mistral
+    model: mistral-large-latest
+    apiKey: YOUR_API_KEY_HERE
+    roles: [chat]
+mcpServers:
+  - name: Filesystem (projects)
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-filesystem', .]
+    cwd: .

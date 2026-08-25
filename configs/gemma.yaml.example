@@ -1,0 +1,15 @@
+name: test-gemma
+version: 1.0.0
+schema: v1
+models:
+  - name: Gemma 4 31B
+    provider: openai
+    apiBase: https://openrouter.ai/api/v1
+    model: google/gemma-4-31b-it:free
+    apiKey: YOUR_API_KEY_HERE
+    roles: [chat]
+mcpServers:
+  - name: Filesystem (projects)
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-filesystem', .]
+    cwd: .

@@ -1,0 +1,3 @@
+# реальні ключі — лише .example версії йдуть у git
+configs/*.yaml
+!configs/*.yaml.example
