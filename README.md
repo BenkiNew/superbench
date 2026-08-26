@@ -1,13 +1,33 @@
 # SUPERBENCH
 
+[![validate](https://github.com/BenkiNew/superbench/actions/workflows/ci.yml/badge.svg)](https://github.com/BenkiNew/superbench/actions/workflows/ci.yml)
+[![leaderboard](https://img.shields.io/badge/leaderboard-live-brightgreen)](https://benkinew.github.io/superbench/)
+
 Відтворюваний benchmark AI coding agents на реальних анонімізованих
 інцидентах. Замість абстрактних задач — мінімальні fixtures із багів, які
 справді траплялися в робочих проєктах.
 
+**[→ Публічний лідерборд](https://benkinew.github.io/superbench/)**
+
+## Спробуй за 2 хвилини (без локального сетапу)
+
+1. Форкніть репозиторій.
+2. Settings → Secrets and variables → Actions → додайте секрет
+   `GROQ_API_KEY` (або `CEREBRAS_API_KEY`/`GEMINI_API_KEY`/`GEMMA_API_KEY`/
+   `GLM_API_KEY`/`MISTRAL_API_KEY` — залежно від провайдера).
+3. Actions → **try-it-yourself** → Run workflow, оберіть інцидент і
+   провайдера.
+4. За ~1-2 хв у Summary запуску — heuristic-скор вашої моделі на реальному
+   багу, без жодного локального встановлення.
+
+Сподобалось — відкрийте PR з вашим `results/`-записом, щоб потрапити у
+спільний лідерборд.
+
 ## Що вже є
 
-- 6 формалізованих інцидентів: asyncio silent skip, AI transcript у Python,
-  inactive Git hook, stale security finding, SQL data-flow, OSV provenance;
+- 7 формалізованих інцидентів: asyncio silent skip, AI transcript у Python,
+  inactive Git hook, stale security finding, SQL data-flow, OSV provenance,
+  silent-success sandboxed scanner;
 - oracle-free bundle для candidate agent;
 - евристичний pre-score з anti-patterns;
 - три нові незалежні reviewer-агенти на кожну відповідь;

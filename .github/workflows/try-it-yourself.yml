@@ -1,0 +1,112 @@
+name: try-it-yourself
+on:
+  workflow_dispatch:
+    inputs:
+      incident:
+        description: "Which incident to solve"
+        type: choice
+        options: [SB-001, SB-002, SB-003, SB-004, SB-005, SB-006, SB-007]
+        default: SB-002
+      provider:
+        description: "Provider config (needs a repo secret named <PROVIDER>_API_KEY, e.g. GROQ_API_KEY)"
+        type: choice
+        options: [groq, cerebras, gemini, gemma, glm, mistral]
+        default: groq
+      model:
+        description: "Override model name (blank = first model in configs/<provider>.yaml.example)"
+        type: string
+        default: ""
+permissions:
+  contents: read
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Continue CLI
+        run: npm i -g @continuedev/cli
+
+      - name: Install PyYAML (config parsing only)
+        run: pip install --quiet pyyaml
+
+      - name: Build a local run config with your key
+        id: config
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMMA_API_KEY: ${{ secrets.GEMMA_API_KEY }}
+          GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+        run: |
+          set -euo pipefail
+          EXAMPLE="configs/${{ inputs.provider }}.yaml.example"
+          if [ ! -f "$EXAMPLE" ]; then
+            echo "::error::No $EXAMPLE in this repo."
+            exit 1
+          fi
+          SECRET_NAME=$(echo "${{ inputs.provider }}" | tr '[:lower:]' '[:upper:]')_API_KEY
+          PROVIDER_API_KEY="${!SECRET_NAME:-}"
+          if [ -z "$PROVIDER_API_KEY" ]; then
+            echo "::error::Add a repository secret named $SECRET_NAME (Settings -> Secrets and variables -> Actions), then re-run this workflow."
+            exit 1
+          fi
+          export PROVIDER_API_KEY
+          RUN_CONFIG=/tmp/run-config.yaml
+          python3 - "$EXAMPLE" "$RUN_CONFIG" <<'PY'
+          import sys, yaml
+          src, dst = sys.argv[1], sys.argv[2]
+          cfg = yaml.safe_load(open(src))
+          key = __import__("os").environ["PROVIDER_API_KEY"]
+          for m in cfg.get("models", []):
+              m["apiKey"] = key
+          yaml.safe_dump(cfg, open(dst, "w"))
+          PY
+          MODEL="${{ inputs.model }}"
+          if [ -z "$MODEL" ]; then
+            MODEL=$(python3 -c "import yaml; print(yaml.safe_load(open('$EXAMPLE'))['models'][0]['name'])")
+          fi
+          echo "model=$MODEL" >> "$GITHUB_OUTPUT"
+          echo "run_config=$RUN_CONFIG" >> "$GITHUB_OUTPUT"
+
+      - name: Run the candidate agent (bounded, read-only, isolated bundle — no access to oracle/results)
+        run: |
+          python3 scripts/run_agent.py "${{ inputs.incident }}" \
+            --model "${{ steps.config.outputs.model }}" \
+            --provider "${{ inputs.provider }}" \
+            --config "${{ steps.config.outputs.run_config }}" \
+            --attempts 1
+
+      - name: Publish score to job summary
+        if: always()
+        run: |
+          set -euo pipefail
+          LATEST=$(ls -td results/*/ 2>/dev/null | head -1 || true)
+          {
+            echo "## superbench · try-it-yourself"
+            echo ""
+            echo "Incident \`${{ inputs.incident }}\` · provider \`${{ inputs.provider }}\` · model \`${{ steps.config.outputs.model }}\`"
+            echo ""
+            if [ -z "$LATEST" ] || [ ! -f "${LATEST}response.json" ]; then
+              echo "No response was recorded — check the \"Run the candidate agent\" step above for the reason (usually an infra/timeout error, not a wrong answer)."
+            else
+              echo '```json'
+              python3 -c "import json; print(json.dumps(json.load(open('${LATEST}response.json'))['heuristic'], indent=2, ensure_ascii=False))"
+              echo '```'
+              echo ""
+              echo "This is a heuristic pre-score, not the final three-agent-panel verdict (see README). Liked what you saw? Open a PR adding your \`results/\` entry to the shared leaderboard."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Do not persist the key-bearing config
+        if: always()
+        run: rm -f "${{ steps.config.outputs.run_config }}"
