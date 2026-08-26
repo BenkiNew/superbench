@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-007",
+  "version": "1.0.0",
+  "title": "Sandboxed scanner job exits 0 every day but never actually scans",
+  "summary": "A systemd oneshot audit job reports SUCCESS daily, but the underlying SAST scanner has been silently failing on every repo for over a day.",
+  "difficulty": "medium",
+  "status": "resolved",
+  "tags": ["systemd", "sandboxing", "silent-failure", "ci", "observability"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

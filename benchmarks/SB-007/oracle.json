@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 80,
+  "criteria": [
+    {
+      "id": "root-cause-sandbox",
+      "description": "Корінь — sandbox-директиви (ProtectHome=read-only + неповний ReadWritePaths), не сам scancli",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["ProtectHome", "ReadWritePaths"]
+    },
+    {
+      "id": "path-mismatch",
+      "description": "Точно вказано розбіжність шляхів: allowlist містить .scancli, а інструмент пише в .cache/scancli",
+      "weight": 25,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["\\.cache/scancli", "\\.scancli.{0,60}\\.cache/scancli", "\\.cache/scancli.{0,60}\\.scancli"]
+    },
+    {
+      "id": "minimal-fix",
+      "description": "Виправлення — додати /home/svc/.cache/scancli до ReadWritePaths, не вимикати sandboxing",
+      "weight": 25,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["ReadWritePaths.{0,80}cache/scancli", "дода(ти|є).{0,30}\\.cache/scancli"]
+    },
+    {
+      "id": "silent-failure-explain",
+      "description": "Пояснено, чому це виглядало як успіх: coverage gate завершує run.sh з exit 0 при SCAN INCOMPLETE, тому systemd бачить SUCCESS",
+      "weight": 20,
+      "core": false,
+      "requires_evidence": false,
+      "patterns": ["exit\\s*0", "coverage.{0,20}gate", "SCAN INCOMPLETE"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "disable-sandboxing",
+      "penalty": 50,
+      "patterns": ["ProtectHome\\s*=\\s*false", "прибрати\\s+ProtectHome", "remove\\s+sandboxing", "run\\s+as\\s+root", "NoNewPrivileges\\s*=\\s*false"]
+    },
+    {
+      "id": "blame-tool-itself",
+      "penalty": 30,
+      "patterns": ["reinstall\\s+scancli", "перевстанов.{0,20}scancli", "downgrade.{0,20}scancli", "оновити\\s+scancli\\s+до"]
+    }
+  ]
+}

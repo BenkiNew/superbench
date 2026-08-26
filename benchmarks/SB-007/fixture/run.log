@@ -1,0 +1,17 @@
+=== 2026-08-26 05:00:37: run started ===
+[fetch] repo-a (ssh, bare mirror)
+[fetch] repo-b (ssh, bare mirror)
+[fetch] repo-c (ssh, bare mirror)
+[fetch_repos.sh] done
+[scancli] repo-a (pinned config=p/secrets)
+Error, failed to open '/home/svc/.cache/scancli/v1.27.1/scancli.bin' for writing.
+[ERROR] scancli did not return valid JSON for repo-a
+[scancli] repo-b (pinned config=p/python)
+Error, failed to open '/home/svc/.cache/scancli/v1.27.1/scancli.bin' for writing.
+[ERROR] scancli did not return valid JSON for repo-b
+[scancli] repo-c (pinned config=p/python)
+Error, failed to open '/home/svc/.cache/scancli/v1.27.1/scancli.bin' for writing.
+[ERROR] scancli did not return valid JSON for repo-c
+[run_scanners.sh] done, artifacts in state/scan-artifacts/2026-08-26
+[coverage] INCOMPLETE: 0/3 repos produced valid scanner output
+=== 2026-08-26 05:00:52: run finished (SCAN INCOMPLETE: coverage gate not passed; AI pass skipped) ===

@@ -1,0 +1,23 @@
+[Unit]
+Description=codescan-audit — read-only SAST+AI audit of tracked repos
+
+[Service]
+Type=oneshot
+User=svc
+Group=svc
+WorkingDirectory=/home/svc/codescan-audit
+EnvironmentFile=/etc/codescan-audit/secure.env
+ExecStart=/home/svc/codescan-audit/scripts/run_code_audit.sh
+StandardOutput=journal
+StandardError=journal
+
+TimeoutStartSec=2400
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/svc/codescan-audit/logs /home/svc/codescan-audit/reports /home/svc/codescan-audit/state /home/svc/codescan-audit/scratch /home/svc/.scancli /home/svc/.config
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
