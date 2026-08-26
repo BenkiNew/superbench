@@ -1,6 +1,6 @@
 # superbench
 
-- CX33-native проєкт у `/home/benkigeek/projects-new/superbench`.
+- CX43-native проєкт у `/home/benkigeek/projects-new/superbench`.
 - Реальні API keys живуть лише в ignored `configs/*.yaml` або
   `/home/benkigeek/.continue/config.yaml` (mode 600).
 - Candidate запускається лише проти `.superbench/workspace/current`; не
