@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-001",
+  "version": "1.0.0",
+  "title": "Silent skip у фоновому asyncio-консюмері",
+  "summary": "Пояснити відсутність фінальних логів без вигаданого зависання чи пропущеного await.",
+  "difficulty": "medium",
+  "status": "resolved",
+  "tags": ["python", "asyncio", "logging", "deduplication"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

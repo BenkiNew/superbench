@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-006",
+  "version": "1.0.0",
+  "title": "OSV приписує репозиторію пакет і версію, яких у ньому немає",
+  "summary": "Відрізнити CVE коду від систематичного artifact-association bug.",
+  "difficulty": "hard",
+  "status": "resolved",
+  "tags": ["osv", "supply-chain", "scanner", "provenance"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

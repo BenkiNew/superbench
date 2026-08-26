@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 80,
+  "criteria": [
+    {
+      "id": "active-path",
+      "description": "Git запускає .githooks/pre-commit через core.hooksPath",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["core\\.hooksPath", "hooksPath.{0,20}\\.githooks", "git-config\\.txt:\\d+"]
+    },
+    {
+      "id": "inactive-guard",
+      "description": "py_compile знаходиться в scripts/git-hooks, який неактивний",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["scripts/git-hooks/pre-commit", "неактивн", "not.{0,20}active"]
+    },
+    {
+      "id": "merge-fix",
+      "description": "Перенести guard в активний hook і зберегти changelog",
+      "weight": 20,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["\\.githooks/pre-commit", "generate_changelog"]
+    },
+    {
+      "id": "negative-test",
+      "description": "Stage invalid Python and require non-zero hook exit",
+      "weight": 15,
+      "core": false,
+      "requires_evidence": false,
+      "patterns": ["invalid.{0,30}(python|\\.py)", "SyntaxError", "ненульов"]
+    }
+  ],
+  "anti_patterns": []
+}

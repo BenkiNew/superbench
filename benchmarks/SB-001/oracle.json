@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 80,
+  "criteria": [
+    {
+      "id": "skip-branch",
+      "description": "Однаковий вміст повертає status=skipped",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["status.{0,12}skipped", "ALREADY_DONE", "вже.{0,20}оброб"]
+    },
+    {
+      "id": "log-filter",
+      "description": "DEBUG відфільтровано рівнем INFO",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["DEBUG.{0,40}INFO", "INFO.{0,40}DEBUG", "logger\\.debug"]
+    },
+    {
+      "id": "await-present",
+      "description": "process_item явно await-иться",
+      "weight": 20,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["await\\s+process_item", "виклик.{0,20}await"]
+    },
+    {
+      "id": "citations",
+      "description": "Є точні file:line цитати",
+      "weight": 10,
+      "core": false,
+      "requires_evidence": true,
+      "patterns": ["repro\\.py:\\d+"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "invented-fire-and-forget",
+      "penalty": 50,
+      "patterns": ["без\\s+await", "not\\s+awaited", "fire.?and.?forget"]
+    }
+  ]
+}

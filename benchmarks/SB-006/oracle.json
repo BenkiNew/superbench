@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 80,
+  "criteria": [
+    {
+      "id": "manifest-mismatch",
+      "description": "requirements has no pygments 2.9.0",
+      "weight": 25,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["requirements.{0,40}(не.{0,15}міст|absent|немає)", "pygments.{0,30}2\\.9\\.0.{0,30}(немає|відсут)"]
+    },
+    {
+      "id": "runtime-version",
+      "description": "runtime has 2.20.0 transitively through pytest",
+      "weight": 20,
+      "core": false,
+      "requires_evidence": true,
+      "patterns": ["2\\.20\\.0", "pytest.{0,30}(транзитив|transitive)"]
+    },
+    {
+      "id": "pipeline-provenance",
+      "description": "stable mismatch indicates wrong artifact/repo association",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["provenance", "artifact.{0,40}(repo|зістав|association)", "пайплайн.{0,30}(артефакт|зістав)"]
+    },
+    {
+      "id": "publication-gate",
+      "description": "cross-check reported package/version against pinned source before publication",
+      "weight": 25,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["gate", "перед.{0,30}публікац", "cross.?check", "зістав.{0,30}(manifest|requirements)"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "publish-medium-cve",
+      "penalty": 40,
+      "patterns": ["MEDIUM.{0,20}вразлив", "оновити.{0,20}pygments.{0,15}2\\.9"]
+    }
+  ]
+}

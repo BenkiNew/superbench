@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-002",
+  "version": "1.0.0",
+  "title": "AI-транскрипт дописано в кінець Python-файлу",
+  "summary": "Знайти точну причину PartialParsing і запропонувати prevention gate.",
+  "difficulty": "easy",
+  "status": "resolved",
+  "tags": ["python", "syntax", "tool-call", "pre-commit"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

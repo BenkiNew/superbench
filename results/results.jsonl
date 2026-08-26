@@ -1,0 +1,5 @@
+{"event":"baseline","incident_id":"SB-001","model":"GLM-5.2","provider":"openrouter","attempt":2,"verdict":"confirmed","date":"2026-08-25","note":"Найповніша правильна відповідь; перша спроба infra-error 429"}
+{"event":"baseline","incident_id":"SB-001","model":"Claude Sonnet 5","provider":"anthropic","attempt":1,"verdict":"confirmed","date":"2026-08-25"}
+{"event":"baseline","incident_id":"SB-001","model":"Gemini Flash","provider":"google","attempt":1,"verdict":"confirmed","date":"2026-08-25"}
+{"event":"baseline","incident_id":"SB-001","model":"Mistral Large","provider":"mistral","attempt":1,"verdict":"rejected","date":"2026-08-25","note":"Вигаданий missing await"}
+{"event":"baseline","incident_id":"SB-001","model":"Gemma 4 31B","provider":"openrouter","attempt":3,"verdict":"infra_error","date":"2026-08-25","note":"429 після трьох спроб"}

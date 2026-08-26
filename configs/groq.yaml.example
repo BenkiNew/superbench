@@ -1,14 +1,14 @@
-name: test-gemini
+name: superbench-groq
 version: 1.0.0
 schema: v1
 models:
-  - name: Gemini Flash
-    provider: gemini
-    model: gemini-flash-latest
-    apiKey: YOUR_API_KEY_HERE
+  - name: Groq GPT-OSS 120B
+    provider: groq
+    model: openai/gpt-oss-120b
+    apiKey: YOUR_GROQ_API_KEY
     roles: [chat]
 mcpServers:
-  - name: Filesystem (projects)
+  - name: Isolated benchmark fixture
     command: npx
     args: ['-y', '@modelcontextprotocol/server-filesystem', .superbench/workspace/current]
     cwd: .

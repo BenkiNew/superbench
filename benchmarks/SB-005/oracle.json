@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 80,
+  "criteria": [
+    {
+      "id": "sort-allowlist",
+      "description": "sort identifier safe only after local allowlist",
+      "weight": 20,
+      "core": false,
+      "requires_evidence": true,
+      "patterns": ["sort.{0,40}allowlist", "ALLOWED_COLUMNS", "sort.{0,30}безпеч"]
+    },
+    {
+      "id": "direction-injection",
+      "description": "direction is interpolated without validation",
+      "weight": 25,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["direction.{0,50}(не.{0,10}валід|injection|allowlist)"]
+    },
+    {
+      "id": "value-injection",
+      "description": "filter values are quoted manually instead of bound",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["values?.{0,50}(парамет|bind|injection|екран)", "placeholders"]
+    },
+    {
+      "id": "local-contract",
+      "description": "builder validates identifiers/direction itself and binds values",
+      "weight": 25,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["локальн", "всередин.{0,30}(функц|builder)", "bindparam", "параметриз"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "all-safe",
+      "penalty": 50,
+      "patterns": ["ус[еі].{0,20}безпеч", "no.{0,10}sql injection"]
+    }
+  ]
+}

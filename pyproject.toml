@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xakerbank-superbench"
+version = "0.2.0"
+description = "Reproducible benchmark for AI coding agents on real anonymized incidents"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "XAKERBANK"}]
+dependencies = []
+
+[project.scripts]
+superbench = "superbench.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["superbench*"]
+

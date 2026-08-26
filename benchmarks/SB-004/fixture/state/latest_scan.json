@@ -1,0 +1,6 @@
+{
+  "scan_date": "2026-08-26",
+  "status": "incomplete",
+  "coverage": {"passed": 0, "expected": 12},
+  "findings": []
+}

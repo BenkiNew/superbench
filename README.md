@@ -1,50 +1,77 @@
-# superbench
+# SUPERBENCH
 
-Бенчмарк AI-моделей на реальних, ще нерозвязаних технічних загадках з живих проєктів — не абстрактні тести, а справжній код і справжні баги.
+Відтворюваний benchmark AI coding agents на реальних анонімізованих
+інцидентах. Замість абстрактних задач — мінімальні fixtures із багів, які
+справді траплялися в робочих проєктах.
 
-Штатний набір тестових інцидентів для перевірки нових AI-моделей перед тим,
-як підключати їх до `~/.continue/config.yaml` на CX33 (чи будь-де ще).
+## Що вже є
 
-## Ідея
+- 6 формалізованих інцидентів: asyncio silent skip, AI transcript у Python,
+  inactive Git hook, stale security finding, SQL data-flow, OSV provenance;
+- oracle-free bundle для candidate agent;
+- евристичний pre-score з anti-patterns;
+- три нові незалежні reviewer-агенти на кожну відповідь;
+- deterministic reducer із replayable criterion trace;
+- до 3 retry для provider/timeout помилок;
+- append-only `results/results.jsonl` і статичний leaderboard;
+- CI: syntax, schema, unit tests, deterministic render і gitleaks.
 
-Замість "теоретичних" бенчмарків — реальні, ще нерозв'язані (на момент
-створення) технічні загадки з наших проєктів. Модель має РЕАЛЬНО прочитати
-код через MCP filesystem і дати конкретну, перевірну відповідь із цитатами
-файл:рядок — не загальні міркування про asyncio "з голови".
+## Швидкий старт
 
-Кожна відповідь потім незалежно звіряється з реальним кодом і фіксується як
-✅ вірна / ❌ хибна / ⏳ технічна помилка (retry). Це дає:
-- чесне порівняння моделей одна проти одної на ОДНАКОВОМУ, складному завданні;
-- ростучу базу — кожен новий реальний інцидент стає новим тестом;
-- фільтр проти моделей, схильних видавати впевнені, але вигадані відповіді.
+```bash
+python3 -m superbench validate
+python3 -m superbench list
+
+python3 -m superbench prepare SB-001 \
+  --output .superbench/workspace/current --force
+
+python3 -m superbench score SB-001 answer.md
+
+python3 -m superbench record SB-001 answer.md \
+  --model "Model Name" --provider provider --attempt 1
+```
+
+Bounded runner для Continue CLI:
+
+```bash
+python3 scripts/run_agent.py SB-001 \
+  --model "Groq GPT-OSS 120B" --provider groq \
+  --config configs/groq.yaml --attempts 3
+```
+
+## Чому три агенти — не majority vote
+
+1. `correctness` розмічає кожен atomic criterion;
+2. `evidence` звіряє candidate file:line із pinned fixture;
+3. `adversarial` може заперечити твердження лише відтвореним тестом.
+
+Reducer рахує `met=1`, `partial=0.5`, решту `0`; invalid evidence обнуляє
+відповідний criterion. Contradicted core criterion або відтворений
+контрприклад для core дає hard fail. Пороги: confirmed `>=80` і всі core met,
+partial `50–79`, rejected `<50` або hard fail.
+
+## Міні-база
+
+`results/results.jsonl` — append-only event ledger. Кожна спроба містить
+incident, model/provider, attempt `1..3`, latency, verdict і UTC date.
+Adjudication дописується окремою подією, тому історія не переписується.
+
+```bash
+python3 -m superbench render --output site
+```
 
 ## Структура
 
+```text
+benchmarks/SB-NNN/   manifest + prompt + fixture + oracle
+agents/              fixed reviewer role contracts
+superbench/          stdlib-only CLI, scoring, reducer, renderer
+results/             JSONL ledger + per-response reviews
+site/                generated static portal
+scripts/             bounded runner and CI
+configs/             local ignored configs + safe examples
+tests/               regression tests
 ```
-incidents/           — один файл на інцидент, повний опис + таблиця результатів
-configs/             — ізольований config.yaml на кожну модель (лише роль chat +
-                        доступ до . через MCP filesystem)
-```
 
-## Як додати нову модель
-
-1. Скопіювати `configs/mistral.yaml` (чи будь-який інший) як шаблон,
-   поставити свій `provider`/`model`/`apiKey`.
-2. Прогнати проти КОЖНОГО файлу з `incidents/` (промпт — у розділі
-   "Точний промпт" кожного інциденту).
-3. Незалежно перевірити відповідь проти реального коду. Дописати рядок у
-   таблицю результатів того інциденту.
-
-## Як додати новий інцидент
-
-Коли трапляється реальна, ще нез'ясована технічна загадка (стій сервісу,
-незрозумілий баг, дивна поведінка логів) — оформити як
-`incidents/NNN-коротка-назва.md` за зразком `001-watch-indexer-silent-stall.md`:
-статус, симптом, що вже перевірено й виключено, відкрите питання, точний
-промпт, таблиця результатів. Не чекати, поки сама загадка розв'яжеться —
-цінність саме в тому, що на момент першого прогону відповіді ще нема.
-
-## Список інцидентів
-
-- [001 — silent stall у watch_indexer.py](incidents/001-watch-indexer-silent-stall.md) —
-  ВИРІШЕНО (Gemini Flash дав вірну відповідь, Mistral Large — хибну)
+Додавання cases описано в [CONTRIBUTING.md](CONTRIBUTING.md), правила
+секретів — у [SECURITY.md](SECURITY.md).

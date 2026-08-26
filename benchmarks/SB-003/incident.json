@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-003",
+  "version": "1.0.0",
+  "title": "Правильний pre-commit guard лежить у неактивному каталозі",
+  "summary": "Пояснити, чому syntax guard існує у репо, але не запускається Git.",
+  "difficulty": "medium",
+  "status": "resolved",
+  "tags": ["git", "hooks", "python", "configuration-drift"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

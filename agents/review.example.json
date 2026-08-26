@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "response_id": "sb-001-model-deadbeef00",
+  "agent_role": "correctness",
+  "agent_name": "fresh-reviewer-session-001",
+  "confidence": 0.9,
+  "criteria": [
+    {"criterion_id": "skip-branch", "status": "met", "candidate_span": "status skipped"}
+  ]
+}

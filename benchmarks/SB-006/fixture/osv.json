@@ -1,0 +1,10 @@
+{
+  "results": [
+    {
+      "source": {"path": "requirements.txt", "type": "lockfile"},
+      "packages": [
+        {"package": {"name": "pygments", "version": "2.9.0"}, "vulnerabilities": ["GHSA-demo"]}
+      ]
+    }
+  ]
+}

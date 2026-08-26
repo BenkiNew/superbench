@@ -10,5 +10,5 @@ models:
 mcpServers:
   - name: Filesystem (projects)
     command: npx
-    args: ['-y', '@modelcontextprotocol/server-filesystem', .]
+    args: ['-y', '@modelcontextprotocol/server-filesystem', .superbench/workspace/current]
     cwd: .

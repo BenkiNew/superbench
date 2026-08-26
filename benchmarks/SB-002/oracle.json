@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 80,
+  "criteria": [
+    {
+      "id": "first-invalid-line",
+      "description": "Перший невалідний рядок — Markdown fence після валідного Python",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["convert_job\\.py:11", "рядок\\s+11", "```"]
+    },
+    {
+      "id": "tool-transcript",
+      "description": "Хвіст є AI/tool-call транскриптом, а не Python",
+      "weight": 25,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["tool.?call", "TOOL_NAME", "AI.{0,20}транскрип"]
+    },
+    {
+      "id": "minimal-fix",
+      "description": "Видалити весь сторонній хвіст, лишити рядки 1-10",
+      "weight": 20,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["видалити.{0,40}(хвіст|рядк)", "залишити.{0,20}(1.?10|валідн)"]
+    },
+    {
+      "id": "precommit-gate",
+      "description": "Додати py_compile/compileall у CI або pre-commit",
+      "weight": 20,
+      "core": false,
+      "requires_evidence": false,
+      "patterns": ["py_compile", "compileall"]
+    }
+  ],
+  "anti_patterns": []
+}

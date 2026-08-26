@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 80,
+  "criteria": [
+    {
+      "id": "fallback-cause",
+      "description": "Incomplete latest scan falls back to last_verified",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["last_verified", "incomplete.{0,50}(fallback|стар|поперед)", "render_security\\.py:1[23456]"]
+    },
+    {
+      "id": "freshness-semantics",
+      "description": "UI must label source date/staleness and current scan incomplete",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["stale", "застаріл", "scan_date", "freshness"]
+    },
+    {
+      "id": "no-manual-delete",
+      "description": "Manual deletion destroys audit history/provenance",
+      "weight": 15,
+      "core": false,
+      "requires_evidence": false,
+      "patterns": ["істор", "audit", "provenance", "не.{0,20}видал"]
+    },
+    {
+      "id": "resolution-model",
+      "description": "New successful re-scan/reverification should transition finding",
+      "weight": 20,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["re.?scan", "повторн.{0,20}(скан|вериф)", "resolved", "transition"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "delete-history",
+      "penalty": 40,
+      "patterns": ["видалити.{0,20}last_verified", "delete.{0,20}last_verified"]
+    }
+  ]
+}
