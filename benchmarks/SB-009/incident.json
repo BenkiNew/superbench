@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-009",
+  "version": "1.0.0",
+  "title": "Dual-AI review dashboard shows CONFLICT when both reviewers found the same bugs",
+  "summary": "Two independent code-review agents flag identical findings (same id/file/line) but the dashboard still shows a red 'conflict' badge because their severity labels differ by one notch.",
+  "difficulty": "medium",
+  "status": "resolved",
+  "tags": ["comparison-logic", "false-positive", "audit-pipeline", "observability"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

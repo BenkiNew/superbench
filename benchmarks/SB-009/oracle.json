@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 80,
+  "criteria": [
+    {
+      "id": "exact-tuple-cause",
+      "description": "Comparison uses full tuple id+severity+repo+file+line; any severity mismatch alone flips the whole result to conflict",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["severity", "compute_agreement\\.sh:1[0-4]", "\\$x==\\$y", "tuple|кортеж"]
+    },
+    {
+      "id": "not-a-real-disagreement",
+      "description": "Both reviewers found the exact same set of id/repo/file/line — they agree on WHAT is wrong, only differ on how severe it is",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["однакі|ідентичн|same (set|findings|issues)", "лише.{0,20}severity|only.{0,20}severity|severity.{0,20}(differ|розбіжн|мітц)"]
+    },
+    {
+      "id": "two-tier-fix",
+      "description": "Proposed fix distinguishes location-only match (same id/repo/file/line, different severity) from a genuine conflict (different findings), e.g. a distinct agreed_severity_diff / calibration-diff status",
+      "weight": 25,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["location.?only|лише.{0,20}(локац|розташ|file.{0,10}line)", "agreed_severity_diff|calibrat|проміжн"]
+    },
+    {
+      "id": "severity-signal-preserved",
+      "description": "Fix does not simply drop severity from the comparison entirely — the mismatch is still visible/logged somewhere, not silently discarded",
+      "weight": 10,
+      "core": false,
+      "requires_evidence": false,
+      "patterns": ["логу|log|surface|show.{0,20}severity|видим"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "always-trust-one-reviewer",
+      "penalty": 35,
+      "patterns": ["завжди.{0,20}(reviewer|A|B)|always trust reviewer"]
+    },
+    {
+      "id": "drop-severity-field",
+      "penalty": 25,
+      "patterns": ["видалити.{0,20}severity.{0,20}(з порівняння|entirely)|remove severity from comparison"]
+    },
+    {
+      "id": "suppress-badge",
+      "penalty": 40,
+      "patterns": ["завжди.{0,20}(agreed|ok)|always.{0,20}return.{0,20}agreed|hide.{0,20}badge|прибрати.{0,20}бейдж"]
+    }
+  ]
+}

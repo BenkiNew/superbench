@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-010",
+  "version": "1.0.0",
+  "title": "Fix looked successful, but the next scheduled job broke because the agent used root instead of the service account",
+  "summary": "An agent with root SSH access fixes a bug, runs the test suite, commits and pushes — everything reports success. Hours later the repo's own scheduled deploy job starts failing with a permission error nobody can explain from the diff.",
+  "difficulty": "hard",
+  "status": "resolved",
+  "tags": ["git", "permissions", "root-access", "agent-behavior", "silent-failure"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

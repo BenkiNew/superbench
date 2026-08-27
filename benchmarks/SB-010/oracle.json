@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 80,
+  "criteria": [
+    {
+      "id": "root-cause-ownership",
+      "description": "The agent ran git add/commit/push as root instead of the svc account that owns the repo, so .git/index, refs and new objects were created root:root",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["root:root|owned by root|root.{0,20}(index|refs|objects)", "svc"]
+    },
+    {
+      "id": "why-success-looked-real",
+      "description": "Root can read/write anything, so the agent's own commands (tests, add, commit, push) all succeeded — the diff was correct, only the file ownership was silently wrong; the break only surfaces later, for a different identity",
+      "weight": 25,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["root.{0,20}(can|has).{0,20}(read|write|access)|root bypasses", "different (user|identity)|інш.{0,10}(користувач|акаунт)", "silent|тих[ао]"]
+    },
+    {
+      "id": "not-just-worker-py",
+      "description": "The fix must restore ownership beyond the two edited files — .git internals (index, refs, objects) and any other files touched during the session, not only the visible diff",
+      "weight": 20,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["chown -R|recursive.{0,20}chown", "\\.git", "index|refs|objects"]
+    },
+    {
+      "id": "prevention-run-as-svc",
+      "description": "Prevention: operate as the owning account (sudo -u svc ...) for repo-level git/build operations even when root access is available, rather than running those commands directly as root",
+      "weight": 25,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["sudo -u svc|su svc|as the (service|owning) (account|user)"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "chmod-777-shortcut",
+      "penalty": 35,
+      "patterns": ["chmod (-R )?777|chmod.{0,10}a\\+rwx"]
+    },
+    {
+      "id": "reinit-repo",
+      "penalty": 40,
+      "patterns": ["git init.{0,20}(again|заново|re-?init)|clone.{0,20}fresh.{0,20}(over|replace)"]
+    },
+    {
+      "id": "blame-the-timer",
+      "penalty": 20,
+      "patterns": ["change.{0,20}nightly-deploy.{0,20}to run as root|timer.{0,20}should run as root"]
+    }
+  ]
+}

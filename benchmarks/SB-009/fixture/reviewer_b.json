@@ -1,0 +1,7 @@
+{
+  "findings": [
+    {"id": "SEC-101", "severity": "INFO", "repo": "billing-api", "file": "main.py", "line": 277},
+    {"id": "SEC-102", "severity": "INFO", "repo": "ingest-worker", "file": "src/processing.py", "line": 47},
+    {"id": "SEC-103", "severity": "INFO", "repo": "search-frontend", "file": "requirements.txt", "line": 1}
+  ]
+}
