@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 80,
+  "criteria": [
+    {
+      "id": "race-restart",
+      "description": "restart_instance() (рядок 60) викликається одразу перед check_ready() (рядок 61) без жодного очікування/поллінгу готовності — типовий cold start ~10-15с гарантовано не встигає",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["check_ready\\(\\)", "\\bwait\\b", "очіку", "poll", "cold.?start"]
+    },
+    {
+      "id": "state-not-persisted",
+      "description": "check_ready() кидає RuntimeError на рядку 61 до того, як виконаються рядки 63-65 (_save_state); тому down_streak лишається зафіксованим на DOWN_STREAK_THRESHOLD-1 (=2) назавжди — кожен наступний цикл повторює той самий рестарт з нуля",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["_save_state.{0,80}(не викону|ніколи|пропуска|skip)", "виключ|exception|RuntimeError.{0,60}(до|перед).{0,20}save", "down_streak.{0,40}(заморож|зафіксован|застряг|не просува)"]
+    },
+    {
+      "id": "not-threshold-config",
+      "description": "Причина не в значеннях DOWN_STREAK_THRESHOLD/ALERT_AFTER_ACTIONS — вони взагалі не досягаються персистентно, тож підняти чи знизити пороги нічого не змінить",
+      "weight": 20,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["не.{0,15}(поріг|threshold)", "THRESHOLD.{0,40}не.{0,15}причина", "поріг.{0,20}не.{0,15}(винен|проблема)"]
+    },
+    {
+      "id": "citations",
+      "description": "Є щонайменше дві точні цитати guard.py:рядок",
+      "weight": 10,
+      "core": false,
+      "requires_evidence": true,
+      "patterns": ["guard\\.py:\\d+"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "invented-network-cause",
+      "description": "Вигадана мережева/DNS/firewall причина, якої немає у fixture",
+      "penalty": 50,
+      "patterns": ["DNS", "firewall", "мереж.{0,15}(недоступ|проблем)", "network.{0,15}(issue|problem)"]
+    }
+  ]
+}

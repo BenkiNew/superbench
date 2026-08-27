@@ -1,0 +1,14 @@
+name: superbench-ollama-deepseek
+version: 1.0.0
+schema: v1
+models:
+  - name: DeepSeek R1 8B
+    provider: ollama
+    model: deepseek-r1:8b
+    apiBase: YOUR_OLLAMA_HOST
+    roles: [chat]
+mcpServers:
+  - name: Isolated benchmark fixture
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-filesystem', .superbench/workspace/current]
+    cwd: .

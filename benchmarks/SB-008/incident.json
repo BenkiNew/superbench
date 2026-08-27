@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-008",
+  "version": "1.0.0",
+  "title": "Guard рестартує щоцикл, але інстанс ніколи не відновлюється й не ескалює в алерт",
+  "summary": "Race condition (рестарт без очікування готовності) ховає збереження стану через непіймане виключення — down_streak застряг назавжди, ескалація ніколи не спрацьовує.",
+  "difficulty": "hard",
+  "status": "resolved",
+  "tags": ["python", "race-condition", "exception-handling", "self-heal", "state-persistence"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}
