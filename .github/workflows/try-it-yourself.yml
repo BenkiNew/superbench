@@ -5,7 +5,7 @@ on:
       incident:
         description: "Which incident to solve"
         type: choice
-        options: [SB-001, SB-002, SB-003, SB-004, SB-005, SB-006, SB-007]
+        options: [SB-001, SB-002, SB-003, SB-004, SB-005, SB-006, SB-007, SB-008, SB-009, SB-010]
         default: SB-002
       provider:
         description: "Provider config (needs a repo secret named <PROVIDER>_API_KEY, e.g. GROQ_API_KEY)"
@@ -22,13 +22,13 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "20"
 
