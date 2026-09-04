@@ -1,0 +1,20 @@
+$ ls -la state/runs/
+drwxr-xr-x.  2 svc svc 4096 Jun 13 05:08 20260613T020429Z-117905
+drwxr-xr-x.  2 svc svc 4096 Jun 14 05:11 20260614T031204Z-118442
+drwxr-xr-x.  2 svc svc 4096 Jun 15 05:03 20260615T030918Z-119007
+
+$ ls state/runs/20260614T031204Z-118442/
+agent-review.json  draft.md  verified-primary.json  verified-fallback.json  verified.json
+
+$ ls state/runs/20260615T030918Z-119007/
+$
+
+$ python3 -c "
+import json
+d = json.load(open('state/runs/20260614T031204Z-118442/verified.json'))
+print('scan_date:', d['scan_date'])
+for f in d['findings']:
+    print(f['id'], f['repo'], f['file'])
+"
+scan_date: 2026-06-14
+FIND-042 billing-service services/billing/migrations/0042_renumber_accounts.py

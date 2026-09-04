@@ -1,0 +1,20 @@
+--- rendered HTML (text-extracted) ---
+
+Confirmed findings from the last full scan (1)
+
+  [LOW] [CONFIRMED]
+  FIND-042 — migration script interpolates a table name into a raw SQL
+  helper without a suppression entry on file
+  services/billing/migrations/0042_renumber_accounts.py:72 · confidence 96%
+
+  Direct read of services/billing/migrations/0042_renumber_accounts.py:70-85
+  confirms the function only ever receives the table name from a fixed
+  tuple of literals at the call site (lines 150-151); no suppression entry
+  for repo=billing-service was found in the config at scan time.
+
+  Recommendation: add a suppression entry for rule_id: raw-sql-table-name,
+  repo: billing-service, file: services/billing/migrations/
+  0042_renumber_accounts.py, matching the existing entries for the
+  reporting-service repo.
+
+--- end rendered HTML ---

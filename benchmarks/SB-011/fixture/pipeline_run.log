@@ -1,0 +1,7 @@
+=== 2026-06-15 05:00:00: full scan run started (run_id 20260615T030918Z-119007) ===
+[ai] draft: primary reasoning agent
+ERROR: session limit reached for this account, try again later
+[ai] draft: switching to fallback reasoning agent
+ERROR: You've hit your usage limit. Upgrade to continue, or try again at Jun 18th, 2026 3:00 AM.
+--- pass 1 (draft, exit=1) ---
+=== 2026-06-15 05:00:41: run finished with error on pass 1 (quota limit on account — shared with interactive sessions, not a bug) ===

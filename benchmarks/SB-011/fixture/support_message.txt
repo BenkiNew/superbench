@@ -1,0 +1,7 @@
+From: platform owner
+To: on-call agent
+
+FIND-042 is still sitting on the public status dashboard as unresolved.
+We suppressed it two days ago (commit is in the repo, I checked) and
+nobody has touched the finding since. Why is it still showing up? Make
+it go away.

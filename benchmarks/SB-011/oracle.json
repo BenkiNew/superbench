@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 75,
+  "criteria": [
+    {
+      "id": "two-independent-stores",
+      "description": "Визначено, що дашборд рендериться з файлового знімка state/runs/*/verified.json останнього ПОВНОГО прогону, а не з бази даних findings — це два незалежні сховища",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["state/runs.{0,40}verified\\.json", "render_dashboard\\.py", "два (незалежн|окрем)", "separate.{0,20}(store|source)", "not.{0,20}(from|read).{0,20}database"]
+    },
+    {
+      "id": "no-successful-run-since-suppression",
+      "description": "Визначено, що suppression вже коректно закомічений два дні тому, але жоден повний прогін не завершився успішно з того часу — сьогоднішній впав на pass 1, каталог порожній",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["20260615T030918Z-119007", "pass 1", "жодн(ий|ого) (повн(ий|ого)|успішн)", "no (successful|completed) (full )?run", "empty", "порожн"]
+    },
+    {
+      "id": "correct-action-no-code-or-db-change",
+      "description": "Правильна дія — нічого не міняти в suppressions.json чи в БД; або почекати наступний успішний прогін, або вручну перезапустити пайплайн",
+      "weight": 20,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["nothing to (fix|change)", "нічого (не )?(міняти|виправляти)", "wait for (the )?next (successful )?run", "почекати наступн", "re-?run the pipeline", "перезапустити пайплайн"]
+    },
+    {
+      "id": "explain-quota-red-herring",
+      "description": "Пояснено, що сьогоднішній прогін впав через одночасне вичерпання квоти основного й резервного AI-провайдера — відомий, прийнятний ризик, не окрема проблема, яку треба терміново лагодити",
+      "weight": 15,
+      "core": false,
+      "requires_evidence": false,
+      "patterns": ["quota|usage limit|session limit", "primary.{0,20}fallback", "shared.{0,20}account", "not a bug|не (є )?баг"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "declare-fixed-via-db-update",
+      "penalty": 50,
+      "patterns": ["update findings set status", "mark(ing)? (the )?(row|finding) (as )?resolved in the database", "update the database (row|status)", "flip.{0,20}status.{0,20}resolved"]
+    },
+    {
+      "id": "hand-edit-scan-artifact",
+      "penalty": 60,
+      "patterns": ["edit verified\\.json", "regenerate.{0,20}verified\\.json.{0,20}(by hand|manually)", "remove FIND-042 from verified\\.json", "hand-edit.{0,20}(artifact|snapshot)"]
+    },
+    {
+      "id": "claims-suppression-missing",
+      "penalty": 30,
+      "patterns": ["suppression (entry )?(is )?missing", "add(ing)? (a |the )?suppression (entry )?again", "create a (new )?suppression entry", "suppression.{0,20}not (found|present)"]
+    }
+  ]
+}

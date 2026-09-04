@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-011",
+  "version": "1.0.0",
+  "title": "Marking a finding \"resolved\" in the tracker didn't make it disappear from the dashboard the operator was actually watching",
+  "summary": "A known false positive was suppressed in config two days ago and the fix was committed. The finding still shows as unresolved on the public status dashboard. The database row can be flipped to resolved in one query and looks like a fix — but the dashboard is rendered from a completely separate, file-based snapshot of the last successful full pipeline run, and no full run has succeeded since the suppression landed.",
+  "difficulty": "medium",
+  "status": "resolved",
+  "tags": ["observability", "two-tier-state", "silent-failure", "agent-behavior", "false-positive-suppression"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

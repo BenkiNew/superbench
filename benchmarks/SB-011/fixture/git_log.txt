@@ -1,0 +1,6 @@
+$ git log --oneline -5 -- suppressions.json
+f2a91cd fix: add suppression for FIND-042 (billing-service migration)
+a5f1c02 fix: add suppression for reporting-service raw-sql-table-name
+70a17df chore: tighten martian-source log filter
+$ git log -1 f2a91cd --format='%ad' --date=iso
+2026-06-14 03:12:04 +0000

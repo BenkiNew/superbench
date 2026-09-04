@@ -1,0 +1,21 @@
+{
+  "_comment": "Human-confirmed false positives. Matched by (rule_id, repo, file) — not line/commit_sha/snippet_hash, since those shift on every unrelated edit to the same file.",
+  "suppressions": [
+    {
+      "rule_id": "raw-sql-table-name",
+      "repo": "reporting-service",
+      "file": "main.py",
+      "reason": "Table name is a hardcoded constant; values go through bind parameters.",
+      "decided_by": "owner+agent",
+      "date": "2026-08-25"
+    },
+    {
+      "rule_id": "raw-sql-table-name",
+      "repo": "billing-service",
+      "file": "services/billing/migrations/0042_renumber_accounts.py",
+      "reason": "table parameter is exclusively a hardcoded literal from the fixed call-site tuple (lines 150-151); row values go through bind parameters.",
+      "decided_by": "owner+agent",
+      "date": "2026-06-14"
+    }
+  ]
+}
