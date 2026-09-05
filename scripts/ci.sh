@@ -16,10 +16,7 @@ fi
 
 # 26.08.2026: gitleaks ловить лише секрето-подібні патерни (ключі, токени),
 # не internal hostnames/IP з приватної інфраструктури, звідки анонімізуються
-# інциденти. Малий, точковий deny-list — лише для benchmarks/, де реально
-# копіюється матеріал з приватних репо. CLAUDE.md і deploy/ навмисно
-# лишають реальні внутрішні шляхи/hostname (стандартна практика для цього
-# проєкту) — їх це НЕ стосується, щоб не різати вже прийняте по живому.
+# інциденти. Перевіряємо весь публічний tracked tree, а не лише fixtures.
 DENYLIST=(
   'benkigeek'
   'benkiserver'
@@ -29,8 +26,8 @@ DENYLIST=(
 )
 LEAK_FOUND=0
 for pattern in "${DENYLIST[@]}"; do
-  if git ls-files -z -- benchmarks | xargs -0 grep -InE "$pattern" -- 2>/dev/null; then
-    echo "[ci] denylist match in benchmarks/ for pattern: $pattern" >&2
+  if git ls-files -z | grep -zv '^scripts/ci.sh$' | xargs -0 grep -InE "$pattern" -- 2>/dev/null; then
+    echo "[ci] internal identifier in public tracked tree: $pattern" >&2
     LEAK_FOUND=1
   fi
 done

@@ -9,30 +9,26 @@
 
 **[→ Публічний лідерборд](https://benkinew.github.io/superbench/)**
 
-## Спробуй за 2 хвилини (без локального сетапу)
+## Модель публікації
 
-1. Форкніть репозиторій.
-2. Settings → Secrets and variables → Actions → додайте секрет
-   `GROQ_API_KEY` (або `CEREBRAS_API_KEY`/`GEMINI_API_KEY`/`GEMMA_API_KEY`/
-   `GLM_API_KEY`/`MISTRAL_API_KEY` — залежно від провайдера).
-3. Actions → **try-it-yourself** → Run workflow, оберіть інцидент і
-   провайдера.
-4. За ~1-2 хв у Summary запуску — heuristic-скор вашої моделі на реальному
-   багу, без жодного локального встановлення.
+Публічний GitHub містить тільки код benchmark, анонімізовані fixtures,
+критерії, алгоритм reducer і згенерований статичний leaderboard. GitHub Pages
+публікує лише каталог `site/` і не має доступу до серверів, баз даних,
+DATABANK, внутрішніх журналів або ключів.
 
-Сподобалось — відкрийте PR з вашим `results/`-записом, щоб потрапити у
-спільний лідерборд.
+Приватне серверне дзеркало доступне лише через Tailscale і не є
+публічним тестовим середовищем. Candidate запускається користувачем у Codex
+або Claude проти ізольованого bundle; відповідь передається локальному CLI
+як звичайний файл. Репозиторій не запускає стороннього coding agent у GitHub
+Actions і не приймає provider API keys.
 
 ## Що вже є
 
-- 7 формалізованих інцидентів: asyncio silent skip, AI transcript у Python,
-  inactive Git hook, stale security finding, SQL data-flow, OSV provenance,
-  silent-success sandboxed scanner;
+- 11 формалізованих анонімізованих інцидентів;
 - oracle-free bundle для candidate agent;
 - евристичний pre-score з anti-patterns;
 - три нові незалежні reviewer-агенти на кожну відповідь;
 - deterministic reducer із replayable criterion trace;
-- до 3 retry для provider/timeout помилок;
 - append-only `results/results.jsonl` і статичний leaderboard;
 - CI: syntax, schema, unit tests, deterministic render і gitleaks.
 
@@ -45,18 +41,12 @@ python3 -m superbench list
 python3 -m superbench prepare SB-001 \
   --output .superbench/workspace/current --force
 
+# Передайте PROMPT.md і fixture з цього bundle окремій сесії Codex або Claude,
+# збережіть її остаточну відповідь у answer.md, потім перевірте результат.
 python3 -m superbench score SB-001 answer.md
 
 python3 -m superbench record SB-001 answer.md \
   --model "Model Name" --provider provider --attempt 1
-```
-
-Bounded runner для Continue CLI:
-
-```bash
-python3 scripts/run_agent.py SB-001 \
-  --model "Groq GPT-OSS 120B" --provider groq \
-  --config configs/groq.yaml --attempts 3
 ```
 
 ## Чому три агенти — не majority vote
@@ -89,7 +79,6 @@ superbench/          stdlib-only CLI, scoring, reducer, renderer
 results/             JSONL ledger + per-response reviews
 site/                generated static portal
 scripts/             bounded runner and CI
-configs/             local ignored configs + safe examples
 tests/               regression tests
 ```
 
