@@ -10,7 +10,7 @@
   (напр. `convert_today.py`→`convert_job.py`, `realuser`→`svc`).
   Технічна суть бага при цьому зберігається повністю — анонімізація
   стосується ідентифікаторів, не деталей.
-- `scripts/ci.sh` автоматично блокує коміт, якщо в `benchmarks/` є
-  internal hostname/IP з приватної інфраструктури (deny-list).
+- `scripts/ci.sh` автоматично блокує коміт, якщо у tracked tree є internal
+  hostname/IP з приватної інфраструктури (deny-list).
 - Публікується тільки GitHub Pages зі статичного `site/`. Приватний серверний
   vhost не відкривається в Інтернет і доступний лише через Tailscale.

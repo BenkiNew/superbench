@@ -78,7 +78,7 @@ agents/              fixed reviewer role contracts
 superbench/          stdlib-only CLI, scoring, reducer, renderer
 results/             JSONL ledger + per-response reviews
 site/                generated static portal
-scripts/             bounded runner and CI
+scripts/             validation and CI helpers
 tests/               regression tests
 ```
 
