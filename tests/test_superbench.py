@@ -57,6 +57,7 @@ class SuperbenchTests(unittest.TestCase):
             results.mkdir()
             (results / "results.jsonl").write_text('{"event":"baseline","model":"Test","verdict":"confirmed"}\n', encoding="utf-8")
             page = render_site(root / "site", results)
+            self.assertIn('/_/css/superstyle.css', page.read_text(encoding="utf-8"))
             text = page.read_text(encoding="utf-8")
             self.assertIn("SUPERBENCH", text)
             self.assertIn("SB-006", text)

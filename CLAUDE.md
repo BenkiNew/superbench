@@ -10,3 +10,6 @@
 - Перед commit: `./scripts/ci.sh`.
 - Після зміни даних: `python3 -m superbench render --output site`.
 - Nginx static, systemd/backend/database не потрібні.
+- Browser runtime повністю локальний: базові токени та шрифти беруться з
+  standby-пулу `standby-infra/static` через same-origin `/_/css/superstyle.css`;
+  у проєкт не додавати CDN, Google Fonts чи інші WAN-залежності.
