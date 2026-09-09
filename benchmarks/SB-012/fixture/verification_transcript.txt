@@ -1,0 +1,21 @@
+verification notes attached to commit 8f2c1a0, pasted into the ticket by platform-eng:
+
+> Verified the fix works. Ran this directly against the DB:
+>
+> ```python
+> local_files = scan_legacy_drop_folder(LEGACY_DROP_ROOT / "2026-09-07")
+> submissions = await fetch_submissions(db, "2026-09-07")
+> files = merge_sources("2026-09-07", submissions, local_files)
+> print(len(files))  # 14
+> for f in files:
+>     if f.get("team") == "north-district":
+>         print(f)
+> ```
+>
+> Output shows all 3 north-district files from the legacy folder, correctly
+> merged with the 11 bot submissions from other teams. No duplicates. Ran it
+> twice on two different dates to be sure. Closing as fixed.
+
+(No request was made against the running /api/coverage endpoint itself
+during this verification — the script above calls merge_sources()
+directly with a manually-constructed local_files argument.)

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 75,
+  "criteria": [
+    {
+      "id": "hardcoded-empty-list-at-call-site",
+      "description": "Визначено, що endpoint.py рахує legacy_files (рядок 23), але викликає merge_sources() з захардкодженим порожнім списком [] (рядок 27) замість обчисленої змінної legacy_files",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["endpoint\\.py:2[37]", "merge_sources\\(date, submissions, \\[\\]\\)", "hardcoded.{0,20}empty.{0,20}list", "захардкоджен.{0,20}порожн", "legacy_files.{0,30}(never|not).{0,20}(used|passed)", "обчислен.{0,20}(але|проте).{0,20}не (передан|використ)"]
+    },
+    {
+      "id": "verification-bypassed-real-code-path",
+      "description": "Визначено, що верифікація в тікеті викликала merge_sources() напряму з вручну сконструйованим local_files, а не через реальний /api/coverage ендпоінт — тому тест пройшов, хоча реальний виклик так і лишився зламаним",
+      "weight": 35,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["verification_transcript", "call(s|ed)? merge_sources\\(\\) directly", "manually.{0,20}(constructed|supplied|provided).{0,20}(local_files|argument)", "did not (call|test|exercise) (the )?(real |actual |running )?(/api/coverage|endpoint)", "verif.{0,20}(обійшла|не (пройшла|торкнулась)).{0,20}(реальн|справжн)"]
+    },
+    {
+      "id": "service-log-confirms-live-bug",
+      "description": "Використано service_log.txt як доказ того, що реальний ендпоінт і зараз повертає лише 11 файлів (без 3 north-district), а не 14, як показала верифікація",
+      "weight": 15,
+      "core": false,
+      "requires_evidence": true,
+      "patterns": ["service_log", "11 files?", "не 14", "not 14", "discrepan(cy|t)"]
+    },
+    {
+      "id": "correct-minimal-fix",
+      "description": "Запропоновано точну мінімальну правку — замінити [] на legacy_files у виклику merge_sources() на рядку 27; merge_sources() і legacy_scan.py не потребують змін",
+      "weight": 15,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["merge_sources\\(date, submissions, legacy_files\\)", "replace.{0,20}\\[\\].{0,20}(with )?legacy_files", "заміни(ти)?.{0,20}\\[\\].{0,20}legacy_files", "merge_sources\\.py.{0,20}(not|немає).{0,20}(потреб|need).{0,20}(зм|change)"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "blames-merge-sources-function",
+      "penalty": 45,
+      "patterns": ["bug (is |lies )?in merge_sources\\(\\)", "rewrite merge_sources", "merge_sources\\(\\) (is broken|has a bug|doesn't work)", "проблема в merge_sources"]
+    },
+    {
+      "id": "blames-legacy-scan-function",
+      "penalty": 40,
+      "patterns": ["scan_legacy_drop_folder.{0,20}(is broken|bug|returns wrong)", "legacy_scan\\.py.{0,20}(broken|bug|incorrect)"]
+    },
+    {
+      "id": "accepts-verification-as-proof",
+      "penalty": 50,
+      "patterns": ["verification (confirms|proves|shows).{0,20}(fix|works)(?!.{0,60}(but|however|проте|але|не (торкн|перевір)))", "already fixed.{0,20}(no|nothing) (further )?action", "тікет.{0,20}(правильно )?закритий.{0,20}(нічого|більше нічого)"]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-012",
+  "version": "1.0.0",
+  "title": "Manually calling the merge function with the right argument \"proved\" the fix — the real endpoint still hardcodes the old one",
+  "summary": "A per-day coverage dashboard merges two sources: submissions recorded in a database table and files found by scanning a legacy network drop folder. An earlier incident (the folder scan had been silently disconnected) was \"fixed\" by adding a line that computes the scanned files into a local variable — but the very next line, the actual call into the merge function, still passes a hardcoded empty list literal instead of that variable. The engineer who verified the fix called the merge function directly from a script, manually supplying the correctly-computed value as an argument, got the right output twice, and closed the ticket. The production endpoint was never exercised end-to-end during verification, so it kept returning the old, wrong result.",
+  "difficulty": "medium",
+  "status": "resolved",
+  "tags": ["silent-failure", "verification-methodology", "agent-behavior", "regression", "two-source-merge"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

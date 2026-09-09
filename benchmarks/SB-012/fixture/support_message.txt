@@ -1,0 +1,12 @@
+From: regional-coordinator
+To: platform-eng
+Date: 2026-09-09
+
+Coverage dashboard still shows "north-district: 0" for today and every
+day this week. I know you said this was fixed on Monday (ticket #4417) —
+I refreshed the page just now, still zero. The bot submissions for other
+teams are showing up fine, it's specifically north-district (the team
+still using the shared network folder instead of the bot) that's blank.
+
+Can you check again? This is the third day I'm manually cross-checking
+their folder by hand before the weekly report.
