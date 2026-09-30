@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-013",
+  "version": "1.0.0",
+  "title": "An unauthenticated request crashes a worker with RecursionError — no valid key, no login, no auth-log entry",
+  "summary": "A JWT auth dependency's except clause only catches InvalidTokenError, on the assumption that a malformed or forged token always produces one. The installed JWT library parses the token header (json.loads on client-supplied data, no depth limit) before it ever checks the signature — so a deeply nested header alone, with no valid key and no prior login, raises an uncaught RecursionError that is not a subclass of InvalidTokenError. Support sees sporadic worker crashes with an empty auth log for that minute and initially suspects application logic; the real fix is a dependency version bump (the vendor's own changelog fixed exactly this, without spelling out that it was pre-auth reachable).",
+  "difficulty": "hard",
+  "status": "resolved",
+  "tags": ["security", "unauthenticated-dos", "exception-hierarchy", "dependency-cve", "order-of-operations"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

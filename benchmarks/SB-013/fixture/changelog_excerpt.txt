@@ -1,0 +1,10 @@
+Витяг з нотаток релізу PyJWT (версія N+1, встановлена того тижня, коли надійшла
+скарга нижче, — сам проєкт ще не оновлений):
+
+  Fixed
+  -----
+  - Handle deeply nested or malformed JWS/JWK header input without an
+    uncaught recursion error or a whole-batch parsing failure.
+
+Більше про цю зміну в самих нотатках релізу немає — ні слова про
+автентифікацію, ні про те, чи потрібен валідний ключ для відтворення.

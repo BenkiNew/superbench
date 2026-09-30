@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 75,
+  "criteria": [
+    {
+      "id": "header-parsed-before-signature-verified",
+      "description": "Визначено, що decode() спершу парсить JSON заголовка (_load, jwt_decode_internals.py:24-30) і лише ПОТІМ перевіряє підпис (jwt_decode_internals.py:16-17) — тому атака на парсер заголовка не потребує валідного ключа чи підпису",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["jwt_decode_internals\\.py:1[0-4]", "jwt_decode_internals\\.py:(19|2[0-6])", "header.{0,20}(parsed|parses|decoded).{0,20}before.{0,20}(signature|verif)", "заголовок.{0,20}парситься.{0,20}(до|перед).{0,20}(перевір|підпис)", "no (valid )?(key|signature) (is )?(required|needed)", "не потр(ібен|ебує).{0,20}(валідн|справжн).{0,20}(ключ|підпис)"]
+    },
+    {
+      "id": "recursion-error-not-a-value-error",
+      "description": "Визначено, що json.loads() на глибоко вкладеному заголовку кидає RecursionError (RuntimeError), а не ValueError/InvalidTokenError-сумісний виняток — тому проходить повз except InvalidTokenError у deps.py:16",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["RecursionError", "deps\\.py:(19|20|24|25)", "not (a |an )?(subclass|instance) of (InvalidTokenError|PyJWTError)", "не (є )?(підклас|нащадок).{0,20}InvalidTokenError", "except InvalidTokenError.{0,20}(не ловить|does not catch|doesn't catch)", "uncaught|необроблен"]
+    },
+    {
+      "id": "service-log-confirms-no-auth-attempt",
+      "description": "Використано service_log.txt і/або bug_report.txt як доказ, що падіння не збігається з жодним входом у систему — атака анонімна",
+      "weight": 15,
+      "core": false,
+      "requires_evidence": true,
+      "patterns": ["service_log", "bug_report", "(no|without|без) (successful )?(login|authentication|вход)", "жодного запису.{0,20}журнал"]
+    },
+    {
+      "id": "fix-is-dependency-not-app-logic",
+      "description": "Визначено, що проблема в самій бібліотеці (changelog_excerpt.txt), а не в бізнес-логіці auth.py/deps.py — запропоновано оновити версію бібліотеки (PyJWT>=2.14 чи новіше) як основну правку, а не переписувати decode_token/get_current_user",
+      "weight": 20,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["upgrade|update|bump|оновити|підняти", "PyJWT.{0,10}(>=|>|to )?2\\.1[4-9]", "requirements\\.txt", "library (bug|issue|vulnerability)|бібліотек.{0,20}(баг|вразлив)"]
+    },
+    {
+      "id": "defense-in-depth-broader-except",
+      "description": "Додатково запропоновано (не обов'язково, не core) розширити except у deps.py, щоб ловити ширший клас винятків як другий рубіж захисту, а не покладатись лише на версію бібліотеки",
+      "weight": 5,
+      "core": false,
+      "requires_evidence": false,
+      "patterns": ["except Exception", "broader except|ширш.{0,10}except", "defense.in.depth|другий рубіж|додатков.{0,20}захист"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "blames-deps-py-logic-only",
+      "penalty": 45,
+      "patterns": ["bug (is |lies )?in (get_current_user|deps\\.py)(?!.{0,80}(library|бібліотек|PyJWT))", "rewrite get_current_user", "проблема (лише |виключно )?в deps\\.py"]
+    },
+    {
+      "id": "assumes-signature-checked-first",
+      "penalty": 40,
+      "patterns": ["signature (is |gets )?(checked|verified) (first|before)", "потребує валідн(ий|ого) (ключ|підпис).{0,20}щоб.{0,20}(викликати|запустити|trigger)"]
+    },
+    {
+      "id": "blames-user-input-validation-missing-generically",
+      "penalty": 20,
+      "patterns": ["just add input validation(?!.{0,60}(header|заголовк))", "просто дода(ти|йте) валідацію(?!.{0,60}(заголовк|header))"]
+    }
+  ]
+}

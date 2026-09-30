@@ -1,0 +1,22 @@
+10:14:02 INFO  GET /api/reports/daily 200 41ms user=anna
+10:14:55 INFO  GET /api/reports/daily 200 38ms user=anna
+10:15:03 ERROR Exception in ASGI application
+Traceback (most recent call last):
+  File "starlette/routing.py", line 693, in dispatch
+    solved = await run_endpoint_function(...)
+  File "deps.py", line 16, in get_current_user
+    payload = decode_token(token)
+  File "auth.py", line 20, in decode_token
+    return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+  File "jwt/api_jwt.py", line 210, in decode
+    decoded = self.decode_complete(jwt, key, algorithms, options, ...)
+  File "jwt/api_jwt.py", line 118, in decode_complete
+    self._load(jwt)
+  File "jwt/api_jws.py", line 244, in _load
+    header = json.loads(header_json)
+  File "json/decoder.py", line 355, in raw_decode
+    obj, end = self.scan_once(s, idx)
+  [... 3994 similar frames omitted ...]
+RecursionError: maximum recursion depth exceeded
+10:15:03 INFO  GET /api/reports/daily 200 40ms user=anna
+10:16:11 INFO  GET /api/reports/daily 200 39ms user=anna
