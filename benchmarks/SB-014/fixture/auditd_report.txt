@@ -1,0 +1,24 @@
+$ auditctl -a always,exit -F arch=b64 -S getxattr,lgetxattr,fgetxattr
+$ sleep 2 && ausearch -m avc,user_avc -ts recent -i 2>/dev/null; ausearch -sc getxattr,lgetxattr,fgetxattr -ts recent -i
+
+----
+type=SYSCALL msg=audit(1234567890.111:501): arch=c000003e syscall=192(lgetxattr)
+  success=no exit=-95(EOPNOTSUPP) pid=41220 comm="fuse.read" exe="/usr/bin/union-mount"
+  name="/mnt/docs_union/reports/2026-09-11/report_0417.pdf"
+----
+type=SYSCALL msg=audit(1234567890.114:502): arch=c000003e syscall=192(lgetxattr)
+  success=no exit=-95(EOPNOTSUPP) pid=41220 comm="fuse.read" exe="/usr/bin/union-mount"
+  name="/mnt/docs_union/reports/2026-09-11/report_0418.pdf"
+----
+[... 3609 additional entries in the 2-second window, all identical shape ...]
+
+# Зведення за 2 секунди:
+#   total getxattr/lgetxattr/fgetxattr calls: 3611
+#   unique pid:                                1   (41220)
+#   unique exe:                                1   (/usr/bin/union-mount)
+#   unique comm:                               1   ("fuse.read")
+#   success=yes count:                         0
+#   watch-indexer pid (paused, STOP) відсутній серед викликів повністю.
+#   tree-guard.sh pid (paused, STOP) відсутній серед викликів повністю.
+#   Жодного зовнішнього клієнта (жодного pid поза union-mount самим) не
+#   зафіксовано за весь вимірюваний період.

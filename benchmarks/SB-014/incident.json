@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "SB-014",
+  "version": "1.0.0",
+  "title": "Two suspects paused, CPU load unchanged — the real culprit was a third process nobody was watching",
+  "summary": "A union filesystem mounted over a local branch and a remote SFTP-backed branch keeps 20-30% CPU on the remote-storage client and 5-9% on the union mount itself, hours on end. An engineer suspects the two background tree-walkers, pauses both (SIGSTOP) — no change in CPU. Only a syscall-level audit rule (not application logs) reveals every getxattr/lgetxattr call in the window comes from a single pid: the union mount process itself, querying the security.capability extended attribute on every file it touches. The remote branch's backend does not support xattrs, so every query fails (EOPNOTSUPP), and the failure itself is the extra work — not a bug in either suspect, and not visible from either suspect's own logs or strace. The fix is a documented-but-not---help'd mount option with an exact, easily-mistyped name.",
+  "difficulty": "hard",
+  "status": "resolved",
+  "tags": ["performance", "root-cause", "syscall-tracing", "red-herring", "exact-syntax", "infra"],
+  "prompt": "prompt.md",
+  "fixture": "fixture",
+  "oracle": "oracle.json"
+}

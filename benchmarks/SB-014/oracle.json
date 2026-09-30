@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "pass_threshold": 75,
+  "criteria": [
+    {
+      "id": "suspects_ruled_out_by_pausing",
+      "description": "Визначено, що обидва первинні підозрювані (watch-indexer, tree-guard.sh) призупинені (suspects_timeline.txt:9-10, 12-14), а навантаження не змінилось — отже, вони НЕ причина, і причину треба шукати серед процесів, які продовжують працювати",
+      "weight": 20,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["suspects_timeline\\.txt:(9|1[0234])", "paused|suspended|призупинен|STOP", "(no|without) change|без змін", "not (the|these) (cause|culprit)|не (причина|винуватц)"]
+    },
+    {
+      "id": "auditd_pinpoints_union_mount_itself",
+      "description": "Використано auditd_report.txt як доказ, що ВСІ 3611 виклики getxattr/lgetxattr/fgetxattr за 2с належать одному й тому самому pid/exe — самому union-mount процесу (comm=fuse.read, exe=/usr/bin/union-mount), а не watch-indexer, tree-guard.sh чи будь-якому зовнішньому клієнту",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["auditd_report\\.txt:(1[0-9]|2[0-4])", "3611", "single|one|один.{0,10}(pid|process|процес)", "union-mount|fuse\\.read", "not (watch-indexer|tree-guard)|не (watch-indexer|tree-guard)"]
+    },
+    {
+      "id": "xattr-eopnotsupp-mechanism",
+      "description": "Пояснено сам механізм: union-mount питає security.capability xattr на кожен файл під час traversal/lookup, віддалена SFTP-гілка xattr не підтримує → EOPNOTSUPP (strace_mergerfs.txt: lgetxattr errors=9028, усі 9028; auditd_report.txt: success=no exit=-95(EOPNOTSUPP)), і кожен такий провал — зайва операція, що й дає навантаження на CPU union-mount та проксі через rclone (strace_rclone.txt: futex/socket-активність без переданих даних, read_bytes=0)",
+      "weight": 30,
+      "core": true,
+      "requires_evidence": true,
+      "patterns": ["EOPNOTSUPP", "security\\.capability", "strace_mergerfs\\.txt", "lgetxattr", "not support(ed)?.{0,20}xattr|не підтриму.{0,20}xattr"]
+    },
+    {
+      "id": "correct-fix-exact-option-syntax",
+      "description": "Запропонована точна опція монтування security-capability=false (З ДЕФІСОМ, docs_excerpt.txt — саме так, а не з підкресленням) у current_mount_unit.txt",
+      "weight": 15,
+      "core": true,
+      "requires_evidence": false,
+      "patterns": ["security-capability\\s*=\\s*false", "docs_excerpt"]
+    },
+    {
+      "id": "does-not-confuse-cache-attr-option",
+      "description": "Не сплутано з іншою, схожою опцією cache.attr (з docs_excerpt.txt), яка явно НЕ стосується xattr-запитів",
+      "weight": 5,
+      "core": false,
+      "requires_evidence": false,
+      "patterns": ["cache\\.attr.{0,40}(not|does not|не).{0,20}(apply|стосується)"]
+    }
+  ],
+  "anti_patterns": [
+    {
+      "id": "still-blames-watch-indexer-or-guard",
+      "penalty": 45,
+      "patterns": ["disable watch-indexer|вимкнути watch-indexer", "rewrite tree-guard|переписати tree-guard", "reduce.{0,20}(polling|scan).{0,20}(watch-indexer|tree-guard)"]
+    },
+    {
+      "id": "wrong-option-syntax-underscore",
+      "penalty": 35,
+      "patterns": ["security_capability\\s*=\\s*false"]
+    },
+    {
+      "id": "generic-throttle-without-mechanism",
+      "penalty": 25,
+      "patterns": ["(just |просто )?(increase|reduce|throttle|rate.?limit).{0,30}(rclone|union.?mount|connections|threads)(?!.{0,80}(xattr|capability))"]
+    },
+    {
+      "id": "proposes-cache-attr-instead",
+      "penalty": 20,
+      "patterns": ["set cache\\.attr|встанов.{0,10}cache\\.attr(?!.{0,60}(does not|не стосується|separate|different))"]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+$ strace -c -f -p <union_mount_pid> -- sleep 8
+strace: Process <union_mount_pid> attached with 4 threads
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 41.20    0.088811           3     23522           newfstatat
+ 38.05    0.082003           9      9028      9028 lgetxattr
+ 12.66    0.027301           6      4511           read
+  8.09    0.017440           4      4511           write
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.215555                    41572      9028 total
+
+# УСІ 9028 викликів lgetxattr завершились помилкою (errors=9028, тобто
+# 100% error rate). newfstatat (23522 за 8с) — ~2940/с, приблизно один stat
+# на кожен файл під час обходу дерева.

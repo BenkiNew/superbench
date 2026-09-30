@@ -1,0 +1,9 @@
+# systemd unit, скорочено — те, як union mount піднімається зараз.
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/union-mount \
+  -o defaults_permissions,allow_other,use_ino,cache.files=off \
+  /mnt/local_branch=RW:/mnt/remote_branch=RO \
+  /mnt/docs_union
+Restart=on-failure

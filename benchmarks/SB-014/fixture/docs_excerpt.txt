@@ -1,0 +1,15 @@
+Витяг з повної документації union-mount (НЕ з `--help`, там цієї опції
+взагалі не перелічено — вона лише в онлайн-документації на сайті проєкту):
+
+  security-capability=BOOL
+      When 'false' union-mount will not query security.capability
+      xattrs on files when building filehandles / performing lookups.
+      Some remote / network filesystem backends do not support xattrs
+      and answer every such query with an error, which is otherwise
+      silently retried per file. Default: true.
+
+Related, does NOT apply here (different option, easy to confuse the name):
+
+  cache.attr=SECONDS
+      How long to cache stat() results for a path before re-querying
+      the underlying branch. Does not affect xattr queries.
