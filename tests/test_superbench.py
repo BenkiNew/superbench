@@ -57,7 +57,25 @@ class SuperbenchTests(unittest.TestCase):
             results.mkdir()
             (results / "results.jsonl").write_text('{"event":"baseline","model":"Test","verdict":"confirmed"}\n', encoding="utf-8")
             page = render_site(root / "site", results)
-            self.assertIn('/_/css/superstyle.css', page.read_text(encoding="utf-8"))
+            from html.parser import HTMLParser
+            from urllib.parse import urljoin, urlparse
+
+            class Stylesheets(HTMLParser):
+                hrefs: list[str] = []
+
+                def handle_starttag(self, tag, attrs):
+                    values = dict(attrs)
+                    if tag == "link" and values.get("rel") == "stylesheet":
+                        self.hrefs.append(values["href"])
+
+            parser = Stylesheets()
+            parser.feed(page.read_text(encoding="utf-8"))
+            self.assertTrue(parser.hrefs)
+            for href in parser.hrefs:
+                resolved = urlparse(urljoin("https://example.test/superbench/", href))
+                self.assertTrue(resolved.path.startswith("/superbench/"), href)
+                relative = resolved.path.removeprefix("/superbench/")
+                self.assertTrue((page.parent / relative).is_file(), href)
             text = page.read_text(encoding="utf-8")
             self.assertIn("SUPERBENCH", text)
             self.assertIn("SB-006", text)
