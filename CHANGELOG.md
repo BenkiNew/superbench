@@ -1,0 +1,20 @@
+# CHANGELOG
+
+## 0.3.0 — 2026-10-13
+
+- Додані oracle-free контрольні пари з окремим evaluator key та випадковими
+  нейтральними sample labels.
+- Додані control-record і control-summary: transport status відокремлено
+  від змістовної рецензії; невідомі результати й costs не стають успіхом/нулем.
+- Нові прогони фіксують snapshot, hashes та версії кейсу/harness;
+  adjudication використовує pinned oracle й відхиляє змінений snapshot.
+- Повторні оцінки зберігаються окремими ревізіями; лідерборд більше не
+  рахує ту саму response_id як новий прогін після кожної adjudication.
+- Історичні результати збережені без автоматичної міграції; зовнішні
+  контрольні експерименти не підміняють офіційну agent-panel оцінку.
+
+## Раніше: 0.2.0
+
+Детермінований reducer із correctness/evidence/adversarial roles та
+append-only event ledger. Історію до введення цього CHANGELOG зберігає Git;
+дат випусків заднім числом не встановлюємо.

@@ -14,3 +14,10 @@
 evidence та adversarial. Reviewer не бачить назву candidate model, ціну,
 prior score або висновки інших reviewer-ів. Повторне використання одного
 `agent_name` для тієї самої відповіді блокується CLI.
+
+## Версії та повторні перевірки
+
+Для змін prompt/fixture/oracle підвищуйте version у incident.json і записуйте
+зміст у CHANGELOG. Не редагуйте опубліковані ledger events чи snapshots старих
+прогонів. [Правила історії](docs/VERSIONING.md) і
+[контрольні експерименти](docs/CONTROL_EXPERIMENTS.md) описують новий workflow.

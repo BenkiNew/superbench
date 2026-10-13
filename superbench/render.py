@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .core import collect_runs, incidents
+from . import __version__
 
 
 def e(value: Any) -> str:
@@ -34,10 +35,19 @@ def leaderboard(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[str, dict[str, Any]] = defaultdict(
         lambda: {"runs": 0, "confirmed": 0, "partial": 0, "rejected": 0, "infra": 0, "latencies": []}
     )
-    for row in rows:
+    latest_adjudications = {}
+    for index, row in enumerate(rows):
+        if row.get("event") == "adjudication_finished" and row.get("response_id"):
+            latest_adjudications[row["response_id"]] = index
+    for index, row in enumerate(rows):
+        if (row.get("event") == "adjudication_finished" and row.get("response_id")
+                and latest_adjudications[row["response_id"]] != index):
+            continue
         if row.get("event") not in final_events and row.get("verdict") != "infra_error":
             continue
         model = str(row.get("model", "unknown"))
+        if row.get("verdict") not in ("confirmed", "partial", "rejected", "infra_error"):
+            continue
         stats = grouped[model]
         stats["runs"] += 1
         verdict = row.get("verdict")
@@ -85,7 +95,7 @@ def render_site(output: Path, results_root: Path) -> Path:
         f'''<li><span>{e(item.get('incident_id'))}</span><b>{e(item.get('model'))}</b><i class="{e(item.get('panel_status','pending'))}">{e(item.get('panel_status','pending'))}</i></li>'''
         for item in runs[:8]
     ) or '<li><b>Нові agent-panel результати ще не записані</b></li>'
-    page = f'''<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>SUPERBENCH · AI Agent Benchmark</title><link rel="stylesheet" href="assets/app.css"></head><body><main><header><nav><div class="logo">SB</div><b>SUPERBENCH</b><span>REAL INCIDENTS · VERIFIED ANSWERS</span></nav><div class="hero"><div><p class="eyebrow">BenkiNew · PUBLIC BENCHMARK</p><h1>Бенчмарк, якому<br><em>є що доводити.</em></h1><p class="lead">Реальні анонімізовані інциденти, ізольовані fixtures та три незалежні reviewer-агенти для кожної відповіді.</p><div class="hero-stats"><span><b>{len(catalog)}</b> інцидентів</span><span><b>3</b> reviewers</span><span><b>0</b> runtime secrets</span></div></div><aside><span>PIPELINE</span><ol><li><b>01</b> Isolated bundle</li><li><b>02</b> Candidate agent</li><li><b>03</b> Correctness review</li><li><b>04</b> Evidence review</li><li><b>05</b> Adversarial review</li><li><b>06</b> Deterministic reducer</li></ol></aside></div></header><section><div class="section-title"><div><span>01</span><h2>Каталог інцидентів</h2></div><p>Не toy-задачі — мінімальні відтворення реальних відмов</p></div><div class="cases">{incident_cards}</div></section><section><div class="section-title"><div><span>02</span><h2>Лідерборд</h2></div><p>Якість окремо від стабільності провайдера</p></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Модель</th><th>Якість</th><th>Надійність</th><th>Confirmed</th><th>Infra error</th><th>Avg latency</th></tr></thead><tbody>{board_rows}</tbody></table></div></section><section class="split"><div><div class="section-title"><div><span>03</span><h2>Останні відповіді</h2></div></div><ul class="recent">{recent_rows}</ul></div><div class="principles"><span>TRUST MODEL</span><h2>Один агент не судить іншого одноосібно.</h2><p>Correctness розмічає атомарні факти. Evidence звіряє file:line. Adversarial впливає лише відтвореним контрприкладом. Reducer лишає replayable trace.</p></div></section><footer><b>SUPERBENCH 0.2</b><span>Markdown source of truth · append-only JSONL · no secrets in Git</span></footer></main></body></html>'''
+    page = f'''<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>SUPERBENCH · AI Agent Benchmark</title><link rel="stylesheet" href="assets/app.css"></head><body><main><header><nav><div class="logo">SB</div><b>SUPERBENCH</b><span>REAL INCIDENTS · VERIFIED ANSWERS</span></nav><div class="hero"><div><p class="eyebrow">BenkiNew · PUBLIC BENCHMARK</p><h1>Бенчмарк, якому<br><em>є що доводити.</em></h1><p class="lead">Реальні анонімізовані інциденти, ізольовані fixtures та три незалежні reviewer-агенти для кожної відповіді.</p><div class="hero-stats"><span><b>{len(catalog)}</b> інцидентів</span><span><b>3</b> reviewers</span><span><b>0</b> runtime secrets</span></div></div><aside><span>PIPELINE</span><ol><li><b>01</b> Isolated bundle</li><li><b>02</b> Candidate agent</li><li><b>03</b> Correctness review</li><li><b>04</b> Evidence review</li><li><b>05</b> Adversarial review</li><li><b>06</b> Deterministic reducer</li></ol></aside></div></header><section><div class="section-title"><div><span>01</span><h2>Каталог інцидентів</h2></div><p>Не toy-задачі — мінімальні відтворення реальних відмов</p></div><div class="cases">{incident_cards}</div></section><section><div class="section-title"><div><span>02</span><h2>Лідерборд</h2></div><p>Якість окремо від стабільності провайдера</p></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Модель</th><th>Якість</th><th>Надійність</th><th>Confirmed</th><th>Infra error</th><th>Avg latency</th></tr></thead><tbody>{board_rows}</tbody></table></div></section><section class="split"><div><div class="section-title"><div><span>03</span><h2>Останні відповіді</h2></div></div><ul class="recent">{recent_rows}</ul></div><div class="principles"><span>TRUST MODEL</span><h2>Один агент не судить іншого одноосібно.</h2><p>Correctness розмічає атомарні факти. Evidence звіряє file:line. Adversarial впливає лише відтвореним контрприкладом. Reducer лишає replayable trace.</p></div></section><footer><b>SUPERBENCH {e(__version__)}</b><span>Markdown source of truth · append-only JSONL · no secrets in Git</span></footer></main></body></html>'''
     (output / "index.html").write_text(page, encoding="utf-8")
     superstyle_overrides = r''':root{--bg:var(--ss-bg,#080c13);--panel:var(--ss-surface,#101824);--line:var(--ss-line,#263447);--text:var(--ss-text,#f2f6fb);--muted:var(--ss-text-muted,#8797aa);--blue:var(--ss-info,#57a8ff);--green:var(--ss-ok,#4ed6a0);--orange:var(--ss-warn,#ffb454)}body{font-family:var(--ss-font-sans,system-ui,sans-serif)}'''
     (output / "assets" / "app.css").write_text(CSS + superstyle_overrides, encoding="utf-8")

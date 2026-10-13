@@ -32,13 +32,24 @@ Actions і не приймає provider API keys.
 
 ## Що вже є
 
-- 11 формалізованих анонімізованих інцидентів;
+- 14 формалізованих анонімізованих інцидентів;
 - oracle-free bundle для candidate agent;
 - евристичний pre-score з anti-patterns;
 - три нові незалежні reviewer-агенти на кожну відповідь;
 - deterministic reducer із replayable criterion trace;
 - append-only `results/results.jsonl` і статичний leaderboard;
 - CI: syntax, schema, unit tests, deterministic render і gitleaks.
+
+## Контрольні експерименти й історія
+
+Версія 0.3 додає контрольні пари для перевірки reviewer-ів: знаходження
+внесеної помилки та відхилення правильної відповіді оцінюються окремо.
+Завершений запит без змістовної рецензії не зараховується як придатний voice.
+Контрольні експерименти не змінюють офіційний leaderboard coding agents.
+
+[Контрольні пари](docs/CONTROL_EXPERIMENTS.md),
+[версійність і збереження історії](docs/VERSIONING.md),
+[CHANGELOG](CHANGELOG.md).
 
 ## Швидкий старт
 
