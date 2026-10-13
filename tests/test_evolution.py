@@ -80,6 +80,24 @@ class EvolutionTests(unittest.TestCase):
             report = self.report(); report['voices'][0]['transport_status'] = 'failed'
             with self.assertRaises(BenchError): record_control_review(pair, sample, report)
 
+    def test_requested_roster_cannot_hide_failed_voice(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            pair = self.make_pair(Path(tmp))
+            sample = next(iter(json.loads((pair / 'evaluation.json').read_text())['samples']))
+            report = self.report()
+            report['requested_voice_ids'] = ['one', 'two', 'missing']
+            with self.assertRaises(BenchError):
+                record_control_review(pair, sample, report)
+            report['voices'].append({'id': 'missing', 'transport_status': 'failed', 'error': 'timeout'})
+            event = record_control_review(pair, sample, report)
+            self.assertEqual(event['requested_voices'], 3)
+            self.assertEqual(event['usable_voices'], 1)
+            self.assertEqual(event['panel_status'], 'partial')
+            for roster in [['one', 'two', 'missing', 'one'], 'one', []]:
+                report['requested_voice_ids'] = roster
+                with self.assertRaises(BenchError):
+                    record_control_review(pair, sample, report)
+
     def test_new_run_pins_case_and_oracle(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); source = root / 'source'; shutil.copytree(get_incident('SB-001').root, source)

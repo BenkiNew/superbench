@@ -112,6 +112,14 @@ def record_control_review(pair: Path, sample: str, report: dict[str, Any]) -> di
         if review['verdict'] == 'rejected' and not any(f['decision'] == 'confirmed' for f in findings):
             raise BenchError('Rejected review requires a locally confirmed finding')
         usable.append(review)
+    roster = report.get('requested_voice_ids')
+    if roster is not None:
+        if (not isinstance(roster, list) or not roster
+                or any(not isinstance(item, str) or not item.strip() for item in roster)
+                or len(set(roster)) != len(roster)):
+            raise BenchError('Requested voice roster must contain distinct nonempty identifiers')
+        if set(roster) != ids:
+            raise BenchError('Report must include every requested voice, including failures')
     cost = report.get('cost_usd')
     if cost is not None and (isinstance(cost, bool) or not isinstance(cost, (int, float))
                              or not math.isfinite(cost) or cost < 0):
