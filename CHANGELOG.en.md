@@ -6,7 +6,7 @@
 
 - Added a full English static website and a UA / EN language switch.
 - Added English repository documentation and translated catalog presentation.
-- Both website languages use the same local assets; benchmark inputs and criteria remain unchanged.
+- Both website languages use the same local assets, including a favicon that avoids a missing root favicon.ico request. Benchmark inputs and criteria remain unchanged.
 
 ## 0.3.0 — 2026-10-13
 

@@ -82,6 +82,7 @@ def _page(catalog, runs, board, locale: str) -> str:
     def text(key: str) -> str:
         return e(labels[key])
     css_href = "../assets/app.css" if locale == "en" else "assets/app.css"
+    icon_href = "../assets/favicon.svg" if locale == "en" else "assets/favicon.svg"
     uk_href = "../" if locale == "en" else "./"
     en_href = "./" if locale == "en" else "en/"
     uk_current = ' aria-current="page"' if locale == "uk" else ""
@@ -101,7 +102,7 @@ def _page(catalog, runs, board, locale: str) -> str:
         f'''<li><span>{e(item.get('incident_id'))}</span><b>{e(item.get('model'))}</b><i class="{e(item.get('panel_status','pending'))}">{e(item.get('panel_status','pending'))}</i></li>'''
         for item in runs[:8]
     ) or f'<li><b>{text("empty_runs")}</b></li>'
-    page = f'''<!doctype html><html lang="{locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>SUPERBENCH · AI Agent Benchmark</title><link rel="stylesheet" href="{css_href}"></head><body><main><header><nav><div class="logo">SB</div><b>SUPERBENCH</b>{language_switch}<span>REAL INCIDENTS · VERIFIED ANSWERS</span></nav><div class="hero"><div><p class="eyebrow">BenkiNew · PUBLIC BENCHMARK</p><h1>{text("hero1")}<br><em>{text("hero2")}</em></h1><p class="lead">{text("lead")}</p><div class="hero-stats"><span><b>{len(catalog)}</b> {text("incidents")}</span><span><b>3</b> reviewers</span><span><b>0</b> runtime secrets</span></div></div><aside><span>PIPELINE</span><ol><li><b>01</b> Isolated bundle</li><li><b>02</b> Candidate agent</li><li><b>03</b> Correctness review</li><li><b>04</b> Evidence review</li><li><b>05</b> Adversarial review</li><li><b>06</b> Deterministic reducer</li></ol></aside></div></header><section><div class="section-title"><div><span>01</span><h2>{text("catalog")}</h2></div><p>{text("catalog_note")}</p></div><div class="cases">{incident_cards}</div></section><section><div class="section-title"><div><span>02</span><h2>{text("leaderboard")}</h2></div><p>{text("board_note")}</p></div><div class="table-wrap"><table><thead><tr><th>#</th><th>{text("model")}</th><th>{text("quality")}</th><th>{text("reliability")}</th><th>Confirmed</th><th>Infra error</th><th>Avg latency</th></tr></thead><tbody>{board_rows}</tbody></table></div></section><section class="split"><div><div class="section-title"><div><span>03</span><h2>{text("recent")}</h2></div></div><ul class="recent">{recent_rows}</ul></div><div class="principles"><span>TRUST MODEL</span><h2>{text("principle")}</h2><p>{text("principle_text")}</p></div></section><footer><b>SUPERBENCH {e(__version__)}</b><span>Markdown source of truth · append-only JSONL · no secrets in Git</span></footer></main></body></html>'''
+    page = f'''<!doctype html><html lang="{locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>SUPERBENCH · AI Agent Benchmark</title><link rel="stylesheet" href="{css_href}"><link rel="icon" type="image/svg+xml" href="{icon_href}"></head><body><main><header><nav><div class="logo">SB</div><b>SUPERBENCH</b>{language_switch}<span>REAL INCIDENTS · VERIFIED ANSWERS</span></nav><div class="hero"><div><p class="eyebrow">BenkiNew · PUBLIC BENCHMARK</p><h1>{text("hero1")}<br><em>{text("hero2")}</em></h1><p class="lead">{text("lead")}</p><div class="hero-stats"><span><b>{len(catalog)}</b> {text("incidents")}</span><span><b>3</b> reviewers</span><span><b>0</b> runtime secrets</span></div></div><aside><span>PIPELINE</span><ol><li><b>01</b> Isolated bundle</li><li><b>02</b> Candidate agent</li><li><b>03</b> Correctness review</li><li><b>04</b> Evidence review</li><li><b>05</b> Adversarial review</li><li><b>06</b> Deterministic reducer</li></ol></aside></div></header><section><div class="section-title"><div><span>01</span><h2>{text("catalog")}</h2></div><p>{text("catalog_note")}</p></div><div class="cases">{incident_cards}</div></section><section><div class="section-title"><div><span>02</span><h2>{text("leaderboard")}</h2></div><p>{text("board_note")}</p></div><div class="table-wrap"><table><thead><tr><th>#</th><th>{text("model")}</th><th>{text("quality")}</th><th>{text("reliability")}</th><th>Confirmed</th><th>Infra error</th><th>Avg latency</th></tr></thead><tbody>{board_rows}</tbody></table></div></section><section class="split"><div><div class="section-title"><div><span>03</span><h2>{text("recent")}</h2></div></div><ul class="recent">{recent_rows}</ul></div><div class="principles"><span>TRUST MODEL</span><h2>{text("principle")}</h2><p>{text("principle_text")}</p></div></section><footer><b>SUPERBENCH {e(__version__)}</b><span>Markdown source of truth · append-only JSONL · no secrets in Git</span></footer></main></body></html>'''
     return page
 
 
@@ -116,6 +117,12 @@ def render_site(output: Path, results_root: Path) -> Path:
     (output / "en/index.html").write_text(_page(catalog, runs, board, "en"), encoding="utf-8")
     superstyle_overrides = r''':root{--bg:var(--ss-bg,#080c13);--panel:var(--ss-surface,#101824);--line:var(--ss-line,#263447);--text:var(--ss-text,#f2f6fb);--muted:var(--ss-text-muted,#8797aa);--blue:var(--ss-info,#57a8ff);--green:var(--ss-ok,#4ed6a0);--orange:var(--ss-warn,#ffb454)}body{font-family:var(--ss-font-sans,system-ui,sans-serif)}'''
     (output / "assets" / "app.css").write_text(CSS + LANGUAGE_CSS + superstyle_overrides, encoding="utf-8")
+    (output / "assets/favicon.svg").write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+        '<rect x="2" y="2" width="60" height="60" rx="12" fill="#102a48" stroke="#2d6096" stroke-width="3"/>'
+        '<text x="32" y="41" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#57a8ff">SB</text></svg>\n',
+        encoding="utf-8",
+    )
     return output / "index.html"
 
 
