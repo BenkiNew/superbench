@@ -14,7 +14,7 @@ verifiable evidence instead of plausible explanations alone.
 ## Independent evaluation
 
 Every provider, model, agent and tool is subject to the same
-[independent testing and publication policy](TESTING_POLICY.md).
+[independent testing and publication policy](TESTING_POLICY.en.md).
 SUPERBENCH publishes its own methods, measurements and conclusions under its
 own name. Free access or credits do not grant a provider editorial control.
 Publication rights for joint non-public evaluations require explicit agreement.
