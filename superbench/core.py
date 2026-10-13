@@ -4,10 +4,13 @@ import hashlib
 import json
 import re
 import shutil
+import subprocess
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+from . import __version__
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -156,6 +159,7 @@ def prepare_bundle(incident: Incident, output: Path, force: bool = False) -> Pat
         "fixture_root": "fixture",
         "prompt": "PROMPT.md",
         "oracle_included": False,
+        "case_version": incident.data.get("version", "unversioned"),
     }
     write_json(output / "bundle.json", bundle)
     return output
@@ -216,11 +220,29 @@ def create_run(
     attempt: int = 1,
     latency_ms: int | None = None,
 ) -> Path:
-    rid = response_id(incident.id, model, response)
+    case_hashes = {
+        path.relative_to(incident.root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(incident.root.rglob("*")) if path.is_file()
+    }
+    case_fingerprint = hashlib.sha256(json.dumps(case_hashes, sort_keys=True).encode()).hexdigest()
+    rid = response_id(incident.id, model, response) + "-" + case_fingerprint[:10]
     run = output_root / rid
     if run.exists():
         raise BenchError(f"Відповідь уже зареєстрована: {rid}")
     run.mkdir(parents=True)
+    snapshot = run / "benchmark"
+    shutil.copytree(incident.root, snapshot)
+    pinned_files = {
+        path.relative_to(snapshot).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(snapshot.rglob("*")) if path.is_file()
+    }
+    try:
+        source_commit = subprocess.run(
+            ["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True,
+            text=True, check=True, timeout=5,
+        ).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        source_commit = None
     (run / "response.md").write_text(response.rstrip() + "\n", encoding="utf-8")
     record = {
         "schema_version": 1,
@@ -231,10 +253,17 @@ def create_run(
         "attempt": attempt,
         "latency_ms": latency_ms,
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "response_sha256": hashlib.sha256(response.encode("utf-8")).hexdigest(),
+        "response_sha256": hashlib.sha256((run / "response.md").read_bytes()).hexdigest(),
+        "input_response_sha256": hashlib.sha256(response.encode("utf-8")).hexdigest(),
         "heuristic": score_response(incident, response),
         "panel_status": "pending",
+        "case_version": incident.data.get("version", "unversioned"),
+        "harness_version": __version__,
+        "case_fingerprint": case_fingerprint,
+        "source_commit": source_commit,
+        "benchmark_snapshot": {"directory": "benchmark", "files": pinned_files},
     }
+    write_json(run / "registration.json", record)
     write_json(run / "response.json", record)
     append_jsonl(
         output_root / "results.jsonl",
@@ -248,6 +277,10 @@ def create_run(
             "verdict": "pending_review",
             "latency_ms": latency_ms,
             "date": record["created_at"],
+            "case_version": record["case_version"],
+            "case_fingerprint": record["case_fingerprint"],
+            "source_commit": record["source_commit"],
+            "harness_version": record["harness_version"],
         },
     )
     return run
@@ -331,7 +364,19 @@ def adjudicate(run: Path) -> dict[str, Any]:
         verdict = "pending"
         reason = "Потрібні три різні schema-valid agent-review"
     else:
-        incident = get_incident(response["incident_id"])
+        if "benchmark_snapshot" in response:
+            snapshot = run / response["benchmark_snapshot"]["directory"]
+            for relative, expected in response["benchmark_snapshot"]["files"].items():
+                try:
+                    actual = hashlib.sha256((snapshot / relative).read_bytes()).hexdigest()
+                except OSError as exc:
+                    raise BenchError("Pinned benchmark snapshot is missing") from exc
+                if actual != expected:
+                    raise BenchError("Pinned benchmark snapshot has changed")
+            incident = Incident(snapshot, read_json(snapshot / "incident.json"))
+        else:
+            # Legacy records have no pinned source; their provenance remains explicit.
+            incident = get_incident(response["incident_id"])
         oracle = read_json(incident.oracle_path)
         correctness = {
             row["criterion_id"]: row for row in by_role["correctness"]["criteria"]
@@ -398,6 +443,18 @@ def adjudicate(run: Path) -> dict[str, Any]:
         "reducer_trace": trace,
         "adjudicated_at": datetime.now(timezone.utc).isoformat(),
     }
+    result["harness_version"] = __version__
+    result["case_fingerprint"] = response.get("case_fingerprint")
+    result["case_version"] = response.get("case_version", "unversioned")
+    result["source_commit"] = response.get("source_commit")
+    result["provenance"] = "pinned" if "benchmark_snapshot" in response else "legacy-unpinned"
+    history = run / "adjudications"
+    history.mkdir(exist_ok=True)
+    if not any(history.glob("*.json")) and (run / "adjudication.json").exists():
+        shutil.copy2(run / "adjudication.json", history / "000001.json")
+    sequence = max((int(path.stem) for path in history.glob("*.json")), default=0) + 1
+    result["revision"] = sequence
+    write_json(history / f"{sequence:06d}.json", result)
     write_json(run / "adjudication.json", result)
     response["panel_status"] = verdict
     write_json(run / "response.json", response)
@@ -412,6 +469,9 @@ def adjudicate(run: Path) -> dict[str, Any]:
             "verdict": verdict,
             "score": score,
             "date": result["adjudicated_at"],
+            "revision": result["revision"],
+            "case_version": result["case_version"],
+            "source_commit": result["source_commit"],
         },
     )
     return result

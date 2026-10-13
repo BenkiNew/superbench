@@ -19,6 +19,8 @@ from .core import (
     validate_all,
 )
 from .render import render_site
+from .experiments import prepare_control_pair, record_control_review, control_summary
+from .core import read_json
 
 
 def parser() -> argparse.ArgumentParser:
@@ -50,6 +52,18 @@ def parser() -> argparse.ArgumentParser:
     render = sub.add_parser("render", help="побудувати статичний портал")
     render.add_argument("--output", type=Path, default=ROOT / "site")
     render.add_argument("--results", type=Path, default=ROOT / "results")
+    pair = sub.add_parser("control-prepare", help="prepare an evaluator-only key and blinded bundles")
+    pair.add_argument("incident")
+    pair.add_argument("--correct", type=Path, required=True)
+    pair.add_argument("--incorrect", type=Path, required=True)
+    pair.add_argument("--defect-id", required=True)
+    pair.add_argument("--output", type=Path, required=True)
+    control = sub.add_parser("control-record", help="append a locally adjudicated panel report")
+    control.add_argument("pair", type=Path)
+    control.add_argument("sample")
+    control.add_argument("report", type=Path)
+    summary = sub.add_parser("control-summary", help="summarize latest control reports without ranking")
+    summary.add_argument("pair", type=Path)
     return root
 
 
@@ -90,6 +104,17 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "adjudicate":
             print(json.dumps(adjudicate(args.run), ensure_ascii=False, indent=2))
+            return 0
+        if args.command == "control-prepare":
+            print(prepare_control_pair(get_incident(args.incident), args.correct, args.incorrect,
+                                       args.defect_id, args.output))
+            return 0
+        if args.command == "control-record":
+            print(json.dumps(record_control_review(args.pair, args.sample, read_json(args.report)),
+                             ensure_ascii=False, indent=2))
+            return 0
+        if args.command == "control-summary":
+            print(json.dumps(control_summary(args.pair), ensure_ascii=False, indent=2))
             return 0
         if args.command == "render":
             print(render_site(args.output, args.results))
