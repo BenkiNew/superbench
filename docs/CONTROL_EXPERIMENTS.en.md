@@ -59,8 +59,10 @@ python3 -m superbench control-record .superbench/control-004-v1 sample-a report.
 python3 -m superbench control-summary .superbench/control-004-v1
 ```
 
-Include every requested reviewer, including failures. The CLI cannot determine
-whether an operator omitted voices. Completed transport alone is not a usable
+Include every requested reviewer, including failures. Add `requested_voice_ids` with the complete requested roster. The CLI rejects
+omitted, extra or duplicate voice IDs when this field is present. Legacy reports
+without a roster cannot be checked for omissions; the roster itself still needs
+to be verified against the original request. Completed transport alone is not a usable
 review. Supply `review` only for substantive results. Normalize its verdict to
 accepted, rejected or unclear; the CLI does not grade arbitrary raw text.
 Each finding requires a locally adjudicated confirmed/unsupported decision
