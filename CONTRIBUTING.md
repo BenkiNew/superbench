@@ -1,5 +1,7 @@
 # Як додати benchmark case
 
+**Українська** · [English](CONTRIBUTING.en.md)
+
 1. Створіть `benchmarks/SB-NNN/incident.json`, `prompt.md`, `fixture/` та `oracle.json`.
 2. Fixture має бути анонімізованим, самодостатнім і без секретів чи production-даних.
 3. Prompt повинен вимагати перевірні file:line докази.
@@ -21,3 +23,7 @@ prior score або висновки інших reviewer-ів. Повторне �
 зміст у CHANGELOG. Не редагуйте опубліковані ledger events чи snapshots старих
 прогонів. [Правила історії](docs/VERSIONING.md) і
 [контрольні експерименти](docs/CONTROL_EXPERIMENTS.md) описують новий workflow.
+
+Для українських title/summary додавайте англійський текст каталогу в
+`superbench/localization.py`. Локалізуйте presentation, не вихідні матеріали
+тестового кейсу.

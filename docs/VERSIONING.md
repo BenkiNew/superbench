@@ -1,5 +1,7 @@
 # Версійність та історична відтворюваність
 
+**Українська** · [English](VERSIONING.en.md)
+
 Версія harness задається в pyproject.toml та superbench.__version__.
 Версія кожного кейсу — в incident.json. Змінюючи prompt, fixture або oracle,
 оновлюйте версію кейсу й CHANGELOG; не підміняйте умови старого результату.

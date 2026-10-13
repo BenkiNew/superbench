@@ -184,6 +184,33 @@ class LegacyHistoryTests(unittest.TestCase):
             self.assertEqual(result['revision'], 2)
             self.assertEqual(result['provenance'], 'legacy-unpinned')
 
+class LocaleTests(unittest.TestCase):
+    def test_static_languages_share_assets_and_keep_catalog(self):
+        from superbench.render import render_site
+        from html.parser import HTMLParser
+        from urllib.parse import urljoin, urlparse
+        class Links(HTMLParser):
+            def __init__(self):
+                super().__init__(); self.styles = []; self.languages = {}; self.lang = None
+            def handle_starttag(self, tag, attrs):
+                data = dict(attrs)
+                if tag == 'html': self.lang = data.get('lang')
+                if tag == 'link' and data.get('rel') == 'stylesheet': self.styles.append(data['href'])
+                if tag == 'a' and data.get('hreflang'): self.languages[data['hreflang']] = data['href']
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); results = root / 'results'; results.mkdir()
+            render_site(root / 'site', results)
+            for locale, relative in [('uk', 'index.html'), ('en', 'en/index.html')]:
+                html = (root / 'site' / relative).read_text(); links = Links(); links.feed(html)
+                self.assertEqual(links.lang, locale)
+                self.assertEqual(set(links.languages), {'uk', 'en'})
+                base = 'https://example.test/superbench/' + ('en/' if locale == 'en' else '')
+                self.assertEqual(urlparse(urljoin(base, links.styles[0])).path, '/superbench/assets/app.css')
+                self.assertEqual(urlparse(urljoin(base, links.languages['en'])).path, '/superbench/en/')
+                self.assertEqual(urlparse(urljoin(base, links.languages['uk'])).path, '/superbench/')
+                self.assertIn('SB-014', html)
+            self.assertFalse((root / 'site/en/assets').exists())
+
 
 if __name__ == '__main__':
     unittest.main()

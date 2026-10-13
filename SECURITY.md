@@ -1,5 +1,7 @@
 # Security policy
 
+**Українська** · [English](SECURITY.en.md)
+
 - Для роботи benchmark не потрібні provider API keys; не додавати їх ані в
   репозиторій, ані в GitHub Actions.
 - Fixture не може містити PII, production-документи, токени, `.env`, дампи або сирі логи.

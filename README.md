@@ -1,5 +1,7 @@
 # SUPERBENCH
 
+**Українська** · [English](README.en.md)
+
 [![validate](https://github.com/BenkiNew/superbench/actions/workflows/ci.yml/badge.svg)](https://github.com/BenkiNew/superbench/actions/workflows/ci.yml)
 [![leaderboard](https://img.shields.io/badge/leaderboard-live-brightgreen)](https://benkinew.github.io/superbench/)
 
