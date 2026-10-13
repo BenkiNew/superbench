@@ -91,9 +91,9 @@ Suggested acceptance:
 
 ## Status, notices and legal boundaries
 
-SUPERBENCH is an independent non-commercial research project, not a separate
+SUPERBENCH is an independent research project, not a separate
 legal entity. BenkiNew maintains it; each separate agreement identifies the
-legal parties and their authority. Non-commercial status does not waive
+legal parties and their authority. This policy does not waive
 licenses, contractual obligations or third-party rights.
 
 Rights concerns or factual corrections may be raised through the
