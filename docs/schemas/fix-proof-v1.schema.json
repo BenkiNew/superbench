@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Experimental scoped fix proof v1",
+  "type": "object",
+  "required": [
+    "case_sha256",
+    "response_sha256",
+    "proposal_sha256",
+    "recipe_sha256",
+    "environment_sha256",
+    "scope",
+    "exact_proposal",
+    "baseline_pass",
+    "repair_pass",
+    "checks"
+  ],
+  "properties": {
+    "case_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
+    "response_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
+    "proposal_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
+    "recipe_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
+    "environment_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "exact_proposal": {
+      "type": "boolean"
+    },
+    "baseline_pass": {
+      "type": "boolean"
+    },
+    "repair_pass": {
+      "type": "boolean"
+    },
+    "checks": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "additionalProperties": true
+}

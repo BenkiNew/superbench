@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "benkinew-superbench"
-version = "0.3.1"
+version = "0.4.0"
 description = "Reproducible benchmark for AI coding agents on real anonymized incidents"
 readme = "README.md"
 requires-python = ">=3.11"

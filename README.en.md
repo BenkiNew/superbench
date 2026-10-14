@@ -107,3 +107,7 @@ tests/              regression tests
 See [contribution guidelines](CONTRIBUTING.en.md) and the
 [security policy](SECURITY.en.md). Original prompts, fixtures and oracles are
 not translated by the website: the tested inputs remain unchanged.
+
+## Repair evidence — experimental
+
+Version 0.4 adds proof-record: separate supported / refuted / unverified outcomes within explicit scope. Case, response, proposal, recipe and environment hashes bind each immutable assessment. Existing diagnosis scores and verdicts remain unchanged; model code is never executed and manual review remains required. [Format and CLI](docs/fix-proofs.md).

@@ -19,6 +19,7 @@ from .core import (
     validate_all,
 )
 from .render import render_site
+from .proofs import record_proof
 from .experiments import prepare_control_pair, record_control_review, control_summary
 from .core import read_json
 
@@ -64,6 +65,10 @@ def parser() -> argparse.ArgumentParser:
     control.add_argument("report", type=Path)
     summary = sub.add_parser("control-summary", help="summarize latest control reports without ranking")
     summary.add_argument("pair", type=Path)
+    proof = sub.add_parser("proof-record", help="record experimental scoped repair evidence")
+    proof.add_argument("--expected", type=Path, required=True)
+    proof.add_argument("--proof", type=Path, required=True, help="JSON object or null for absent evidence")
+    proof.add_argument("--output", type=Path, required=True, help="new immutable assessment path")
     return root
 
 
@@ -115,6 +120,14 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "control-summary":
             print(json.dumps(control_summary(args.pair), ensure_ascii=False, indent=2))
+            return 0
+        if args.command == "proof-record":
+            try:
+                report = record_proof(read_json(args.expected),
+                                      json.loads(args.proof.read_text(encoding="utf-8")), args.output)
+            except (ValueError, TypeError) as exc:
+                raise BenchError(str(exc)) from exc
+            print(json.dumps(report, ensure_ascii=False, indent=2))
             return 0
         if args.command == "render":
             print(render_site(args.output, args.results))
