@@ -3,7 +3,8 @@
 Узгоджений стандарт: Python 3.14 там, де використовується Python; Node 24
 для JavaScript-команд. checkout v7.0.1, setup-python/setup-node v7.1.0
 закріплюються SHA; JavaScript Actions мають runtime Node 24.
-Ruff у CI — 0.17.3. Наявні назви required jobs, предметні тести та
+Спільний стандарт Ruff — 0.17.3; він застосовується лише у workflow,
+які використовують Ruff. Наявні назви required jobs, предметні тести та
 пороги збережено. Production і залежності сервісів не оновлюються цим PR.
 
 Успішний локальний синтаксис не замінює фактичного GitHub CI та огляду
