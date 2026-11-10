@@ -1,14 +1,11 @@
 # Перевірка перед злиттям
 
 Наявний CI `test` зберігається. Перед злиттям кожного PR потрібні
-успішна перевірка на поточному head та фактичний огляд CodeRabbit.
-Помилка огляду має блокувати гейт (fail_commit_status=true); квоти
-не підвищуються, пропущений через ліміт огляд не доводить готовності.
+успішна перевірка на поточному head. CodeRabbit знято 10.11.2026: новий огляд не вимагається.
 
 Після перевіреного запуску виконавець налаштовує й повторно читає через API:
 
-- required `test` від GitHub Actions (integration_id/app_id 15368)
-  та CodeRabbit від GitHub App 347564; точні context й джерело обов’язкові;
+- required `test` від GitHub Actions (integration_id/app_id 15368); точний context й джерело обов’язкові;
 - strict=true (у rulesets strict_required_status_checks_policy=true),
   актуальність гілки та результати саме поточного head;
 - Require conversation resolution before merging
